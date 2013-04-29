@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# To use this, put a test script in js/src/crasher.js and run:
+#   hg bisect -c js-bisector
+
+set -eu
+
+HGROOT=`hg root`
+HGREV=`hg parents --template '{rev}:{node|short}'`
+
+JSFLAGS=""
+
+cd $HGROOT/js/src || exit 127
+
+echo "building revision $HGREV in $HGROOT/js/src"
+(js-build -V d > /dev/null) \
+     || (rm -r d-objdir && js-build -V d > /dev/null) \
+     || exit 127
+
+echo "running test"
+./d-objdir/js $JSFLAGS asserter.js

@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+import sys, os, subprocess
+
+usage = """\
+usage: snapshot [overwrite]
+   --overwrite, -o       Overwrite the previous version of this patch.
+"""
+
+HG = 'hg'
+DIR = os.path.join(os.environ['HOME'], 'dev', 'patches')
+
+def hg(*args):
+    p = subprocess.Popen([HG] + list(args), stdout=subprocess.PIPE)
+    output, errors = p.communicate()
+    if errors:  # can't happen
+        print >>sys.stderr, errors
+        sys.exit(2)
+    return output.strip(), p.returncode
+
+# figure out a filename
+name, rc = hg('qtop')
+if rc != 0:
+    print >>sys.stderr, name
+    sys.exit(rc)
+if name.endswith('.patch'):
+    name = name[:-6]
+for i in range(1, 1000):
+    filename = os.path.join(DIR, '%s-v%i.patch' % (name, i))
+    if not os.path.exists(filename):  # not atomic here
+        break
+else:
+    print >>sys.stderr, "can't make a unique filename in 1000 tries"
+    sys.exit(2)
+
+# process -o
+if len(sys.argv) == 1:
+    pass
+elif len(sys.argv) == 2 and sys.argv[1] in ('--overwrite', '-o'):
+    if i == 1:
+        print >>sys.stderr, "no patch found to overwrite!"
+        sys.exit(2)
+    i -= 1
+    filename = os.path.join(DIR, '%s-v%i.patch' % (name, i))
+else:
+    print >>sys.stderr, usage
+    sys.exit(1)
+
+# dump patch to file
+patch, rc = hg('qdiff')
+if rc != 0:
+    sys.exit(rc)
+f = open(filename, 'w')
+f.write(patch)
+f.close()
+
+# and review it, why not
+os.system('${PAGER-more} ' + filename)
+
+print
+print filename

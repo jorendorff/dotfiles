@@ -1,0 +1,226 @@
+#!/usr/bin/env python
+# -*- Python -*-
+
+import sys
+import os, os.path, subprocess, platform
+import re
+import jsutil
+
+if os.path.basename(os.getcwd()) != "src":
+    import jsutil
+    try:
+        srcdir = jsutil.jssrc()
+    except Exception, exc:
+        print >>sys.stderr, "js-build:", exc
+        sys.exit(1)
+    os.chdir(srcdir)
+
+DIST = "../../obj-x86_64-apple-darwin12.3.0/dist"
+
+isWin = platform.system() == "Microsoft"
+isMac = platform.system() == "Darwin"
+isGCC = not isWin
+haveValgrind = not isWin and not isMac
+
+class Variant:
+    def __init__(self, id):
+        self.id = id
+        self.dry_run = False
+        self.hasGcZeal = 'd' in id
+
+        if re.match(r'^m?[rd]x?j?c?(?:32)?$', id) is None:
+            raise ValueError("Unrecognized variant " + id)
+
+        args = ['--enable-readline', '--enable-sm-fail-on-warnings']
+        cflags = []
+        makeArgs = []
+        env = {}
+
+        if '32' in id and not isMac:
+            raise ValueError("combination not supported")
+
+        if isWin:
+            for var in os.environ:
+                env[var] = os.environ[var]
+        else:
+            for var in ['PATH']:
+                if var in os.environ:
+                    env[var] = os.environ[var]
+            env['SHELL'] = '/bin/bash'
+
+            if isMac:
+                env['CC'] = 'clang'
+                env['CXX'] = 'clang++'
+                if '32' in id:
+                    env['LD'] = 'ld'
+                    env['CROSS_COMPILE'] = '1'
+                    env['CC'] += ' -arch i386'
+                    env['CXX'] += ' -arch i386'
+
+        if 'd' in id:
+            args += ['--disable-optimize']
+            if isGCC:
+                args += ['--enable-debug=-g3']
+            else:
+                args += ['--enable-debug']
+            if haveValgrind:
+                args += ['--enable-valgrind']
+        else:
+            args += ['--enable-debug-symbols']
+        if 'c' in id:
+            assert 'd' in id
+            cflags += ['-fprofile-arcs', '-ftest-coverage']
+        if 'm' in id:
+            dist = os.path.abspath(DIST)
+            args += ['--enable-threadsafe',
+                     '--with-nspr-cflags=-I' + dist + '/include/nspr',
+                     '--with-nspr-libs=-L' + dist + '/lib -lnspr4']
+            ##         '--disable-ctypes']
+            ##args += ['--enable-threadsafe', '--with-system-nspr']
+            args += ['--enable-ctypes']
+        if 'x' in id:
+            args += ['--disable-tracejit']
+            makeArgs += ['ENABLE_JIT=']
+        if 'j' in id:
+            args += ['--enable-jemalloc']
+
+        if cflags:
+            for flag in cflags:
+                assert re.match(r'^[0-9A-Za-z_-]*$', flag)
+            env['CFLAGS'] = env['CXXFLAGS'] = ' '.join(cflags)
+
+        self.configureArgs = args
+        self.configureEnv = env
+        self.makeArgs = makeArgs
+
+    def build(self, cmd):
+        objdir = self.id + "-objdir"
+
+        # configure
+        cmd(["mkdir", "-p", objdir])
+        config_ts = os.path.join(objdir, 'config.ts')
+        if (not os.path.exists(config_ts)
+            or os.path.getmtime('configure') >= os.path.getmtime(config_ts)):
+            if not os.path.exists(config_ts):
+                print("###  %r not found" % config_ts)
+            elif os.path.getmtime('configure') >= os.path.getmtime(config_ts):
+                print("### configure: %r; config.ts: %r" % (os.path.getmtime('configure'),
+                                                            os.path.getmtime(config_ts)))
+            else:
+                print("### confused")
+
+            script(cmd, ["../configure"] + self.configureArgs, cwd=objdir,
+                   env=self.configureEnv)
+            cmd(['touch', config_ts])
+
+        # build
+        cmd(["make", "-j4"] + self.makeArgs, cwd=objdir)
+
+        ## # "local install"
+        ## libnspr = os.path.join(objdir, "libnspr4.dylib")
+        ## if not os.path.isfile(libnspr) and not os.path.islink(libnspr):
+        ##     # extra .. to get out of objdir
+        ##     cmd(['ln', '-s', os.path.join('..', DIST, 'bin', 'libnspr4.dylib'), libnspr])
+
+        # smoketest
+        js = os.path.join(objdir, 'js')
+        cmd([js, 'Y.js'])
+        if self.hasGcZeal:
+            cmd([js, '-e', 'gczeal(2)', 'Y.js'])
+
+def autoconf(runcmd):
+    if (not os.path.exists('configure')
+        or os.path.getmtime('configure') <= os.path.getmtime('configure.in')):
+        script(runcmd, ['autoconf-2.13'])
+
+def script(runcmd, command, **kwargs):
+    if isWin:
+        command = ["bash"] + command
+    return runcmd(command, **kwargs)
+
+allVariants = [_m + _r + _x for _x in ('', 'x') for _m in ('', 'm') for _r in ('r', 'd')]
+
+def showCommand(command, cwd=None, env=None, stdout=None):
+    """ Print the shell command line you could use to run the given command. """
+    def quote(arg):
+        if   re.match(r'^[a-zA-Z0-9_/=:\-\.\[\]]*$', arg):
+            return arg
+        elif re.match(r'^[a-zA-Z0-9_/=:\-\.\[\]\'\" ]*$', arg):
+            return '"' + arg.replace('"', r'\"') + '"'
+        else:
+            return "'" + arg.replace("'", r"\'") + "'"
+    stuff = []
+    if cwd:
+        stuff += ["cd", quote(cwd), "&&"]
+    if env:
+        stuff += ['%s=%s' % (k, quote(v)) for k, v in env.items()]
+    stuff += [quote(arg) for arg in command]
+    print(" ".join(stuff))
+
+def runCommandVerbose(*args, **kwargs):
+    print ">>> ",
+    showCommand(*args, **kwargs)
+    return subprocess.check_call(*args, **kwargs)
+
+def runCommand(*args, **kwargs):
+    if os.name == 'posix':
+        f = open("/dev/null", "w")
+    elif os.name == 'nt':
+        f = open("nul:", "w")
+    else:
+        f = None  # no redirection
+    kwargs['stdout'] = f
+
+    try:
+        runCommandVerbose(*args, **kwargs)
+    finally:
+        if f is not None:
+            f.close()
+
+def main():
+    if isMac and sys.version_info < (2, 5, 2):
+        sys.stderr.write("js-build: WARNING: Due to COMMAND_MODE madness, this can fail on Leopard!\n"
+                         "js-build:          Workaround is to upgrade to Python 2.5.2 or later.\n")
+
+    import optparse
+    p = optparse.OptionParser(usage="usage: %prog [-nv] [-V variants]")
+    p.add_option("-v", "--verbose",
+                 dest="verbose", action="store_true", default=False,
+                 help="Print stdout from commands, not just stderr.")
+    p.add_option("-V", "--variants",
+                 dest="variants", default="d",
+                 help="which variants to build")
+    p.add_option("-n", "--dry-run",
+                 dest="dry_run", action="store_true", default=False,
+                 help="Don't actually run any commands; just print them.")
+    (options, []) = p.parse_args()
+
+    try:
+        variants = [Variant(v.strip()) for v in options.variants.split(',')]
+    except ValueError, exc:
+        print >>sys.stderr, exc
+        return 1
+
+    if options.dry_run:
+        runcmd = showCommand
+    elif options.verbose:
+        runcmd = runCommandVerbose
+    else:
+        runcmd = runCommand
+
+    autoconf(runcmd)
+    for v in variants:
+        v.build(runcmd)
+
+    if isMac:
+        runcmd(["say", "build complete"])
+
+if __name__ == '__main__':
+    try:
+        main()
+    except:
+        if isMac:
+            subprocess.Popen(["say", "fail"])
+        raise
+
+        

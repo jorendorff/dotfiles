@@ -1,0 +1,41 @@
+[ui]
+username=Jason Orendorff <jorendorff@mozilla.com>
+merge=internal:merge
+ignore=/Users/jorendorff/.hgignore
+
+[defaults]
+diff=-U 8 -p
+qdiff=-U 8
+
+[diff]
+git=true
+showfunc=true
+
+[extensions]
+rebase=
+mq=
+churn=
+record=
+extdiff=
+patchbomb=
+graphlog=
+hgk=
+children=
+wheres=/Users/jorendorff/bin/hg_wheres.py
+bzexport=/Users/jorendorff/dev/bzexport/bzexport.py
+
+[email]
+from=Jason Orendorff <jorendorff@mozilla.com>
+
+[smtp]
+host=smtp.gmail.com
+tls=True
+username=jason.orendorff@gmail.com
+password=tychob
+
+[alias]
+try = push -f ssh://hg.mozilla.org/try
+
+[hooks]
+post-try = hg phase --force --draft "mq()"
+

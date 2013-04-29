@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+set -u
+
+if [ -f ./js ]; then
+    OBJDIR=`pwd`
+    SRCDIR=`dirname "$OBJDIR"`
+else
+    SRCDIR=`hg root`/js/src
+    OBJDIR=$SRCDIR/d-objdir
+fi
+JS="$OBJDIR/js"
+
+if [ $# == 0 ]; then
+    cd "$OBJDIR/jsapi-tests"
+    #./jsapi-tests
+fi
+
+cd "$SRCDIR/jit-test"
+echo "running jit-test"
+python jit_test.py --ion -f --no-slow "$JS" $@ || echo "FAIL FAIL FAIL"
+
+cd "$SRCDIR/tests"
+echo "running js-tests"
+python jstests.py -j8 "$JS" $@

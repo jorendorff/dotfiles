@@ -1,0 +1,12 @@
+syntax: glob
+TAGS
+ID
+{r,d,mr,md}{,x}-objdir
+*-{r,d,mr,md}{,x}-objdir
+*.orig
+*~
+.gdb_history
+.nss.checkout
+.mozconfig-*
+*.pyc
+*.pyo
