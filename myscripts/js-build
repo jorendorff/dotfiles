@@ -15,7 +15,7 @@ if os.path.basename(os.getcwd()) != "src":
         sys.exit(1)
     os.chdir(srcdir)
 
-DIST = "../../obj-x86_64-apple-darwin12.3.0/dist"
+DIST = "../../obj-x86_64-apple-darwin12.4.0/dist"
 
 isWin = platform.system() == "Microsoft"
 isMac = platform.system() == "Darwin"
