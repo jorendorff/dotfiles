@@ -3,6 +3,7 @@
 export PATH=/usr/local/bin:${PATH}
 export PATH=${PATH}:${HOME}/prefix/bin:${HOME}/bin:${HOME}/dev/dotfiles/myscripts
 export PATH=${PATH}:/usr/local/share/python
+export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
 
 # CVS setings
 export CVS_RSH=ssh
