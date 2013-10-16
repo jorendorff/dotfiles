@@ -28,7 +28,7 @@ class Variant:
         self.dry_run = False
         self.hasGcZeal = 'd' in id
 
-        if re.match(r'^m?[rd]x?j?c?(?:32)?$', id) is None:
+        if re.match(r'^[rd]x?j?c?(?:32)?$', id) is None:
             raise ValueError("Unrecognized variant " + id)
 
         args = ['--enable-readline', '--enable-sm-fail-on-warnings']
@@ -70,14 +70,14 @@ class Variant:
         if 'c' in id:
             assert 'd' in id
             cflags += ['-fprofile-arcs', '-ftest-coverage']
-        if 'm' in id:
-            dist = os.path.abspath(DIST)
-            args += ['--enable-threadsafe',
-                     '--with-nspr-cflags=-I' + dist + '/include/nspr',
-                     '--with-nspr-libs=-L' + dist + '/lib -lnspr4']
-            ##         '--disable-ctypes']
-            ##args += ['--enable-threadsafe', '--with-system-nspr']
-            args += ['--enable-ctypes']
+
+        dist = os.path.abspath(DIST)
+        args += ['--enable-threadsafe',
+                 '--with-nspr-cflags=-I' + dist + '/include/nspr',
+                 '--with-nspr-libs=-L' + dist + '/lib -lnspr4']
+        ##args += ['--enable-threadsafe', '--with-system-nspr']
+        args += ['--enable-ctypes']
+
         if 'x' in id:
             args += ['--disable-tracejit']
             makeArgs += ['ENABLE_JIT=']
@@ -116,11 +116,12 @@ class Variant:
         # build
         cmd(["make", "-j4"] + self.makeArgs, cwd=objdir)
 
-        ## # "local install"
-        ## libnspr = os.path.join(objdir, "libnspr4.dylib")
-        ## if not os.path.isfile(libnspr) and not os.path.islink(libnspr):
-        ##     # extra .. to get out of objdir
-        ##     cmd(['ln', '-s', os.path.join('..', DIST, 'bin', 'libnspr4.dylib'), libnspr])
+        # "local install"
+        for filename in ("libnss3.dylib", "libmozglue.dylib"):
+            lib = os.path.join(objdir, filename)
+            if not os.path.isfile(lib) and not os.path.islink(lib):
+                # extra .. to get out of objdir
+                os.symlink(os.path.join('..', DIST, 'bin', filename), lib)
 
         # smoketest
         js = os.path.join(objdir, 'js')
@@ -138,7 +139,7 @@ def script(runcmd, command, **kwargs):
         command = ["bash"] + command
     return runcmd(command, **kwargs)
 
-allVariants = [_m + _r + _x for _x in ('', 'x') for _m in ('', 'm') for _r in ('r', 'd')]
+allVariants = [_r + _x for _x in ('', 'x') for _r in ('r', 'd')]
 
 def showCommand(command, cwd=None, env=None, stdout=None):
     """ Print the shell command line you could use to run the given command. """
