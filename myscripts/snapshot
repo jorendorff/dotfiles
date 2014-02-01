@@ -16,10 +16,11 @@ def hg(*args):
     if errors:  # can't happen
         print >>sys.stderr, errors
         sys.exit(2)
-    return output.strip(), p.returncode
+    return output, p.returncode
 
 # figure out a filename
 name, rc = hg('qtop')
+name = name.strip()
 if rc != 0:
     print >>sys.stderr, name
     sys.exit(rc)
