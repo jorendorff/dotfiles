@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -eu
+
+cd `hg root`/js/src
+exec grep "$@" *.h *.c *.cpp */*.h */*.cpp builtin/*.js
