@@ -1,16 +1,23 @@
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(package-initialize)
+
 (column-number-mode t)
 (show-paren-mode t)
 
-(add-to-list 'load-path "~/.emacs.d/my-site-lisp")
+(add-to-list 'load-path "~/dev/dotfiles/.emacs.d/my-site-lisp")
 (add-to-list 'load-path "~/dev/mozilla-elisp")
+
+(tool-bar-mode 0)  ;; no nasty tool-bar!
 
 (require 'etags-select)
 (global-set-key "\M-?" 'etags-select-find-tag-at-point)
 (global-set-key "\M-." 'etags-select-find-tag)
+(visit-tags-table "~/dev/mi/TAGS")
 
-
-(require 'color-theme-solarized)
-(color-theme-solarized-light)
+;;(require 'color-theme-solarized)
+;;(color-theme-solarized-light)
 
 (require 'vc-hg)
 ;;(require 'mercurial-queues)
@@ -31,8 +38,8 @@
       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; yay rust
-(add-to-list 'load-path "~/dev/rust/src/etc/emacs/")
-(require 'rust-mode)
+;;(add-to-list 'load-path "~/dev/rust/src/etc/emacs/")
+;;(require 'rust-mode)
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -100,7 +107,7 @@
 
 (defun set-compile-command ()
     (if (in-spidermonkey-dir-p)
-	(setq compile-command "~/bin/js-build")))
+	(setq compile-command "~/dev/dotfiles/myscripts/js-build")))
 
 (add-hook 'change-major-mode-hook 'set-compile-command)
 
@@ -213,16 +220,25 @@
 (define-key global-map "\M-_" 'insert-mdash)
 
 
+;; Erlang goofs.
+
+(setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
+(setq erlang-root-dir "/usr/local/lib/erlang")
+(setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
+(require 'erlang-start)
+
 
 ;; Custom.
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(c-comment-prefix-regexp "#\\|//+>?\\|\\**")
  '(confirm-kill-emacs (quote yes-or-no-p))
  '(fill-column 79)
+ '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(mouse-wheel-progressive-speed nil)
@@ -233,8 +249,8 @@
  '(safe-local-variable-values (quote ((js-indent-level . 2) (js2-basic-offset . 4) (js2-strict-trailing-comma-warning) (js2-skip-preprocessor-directives . t) (js2-basic-offset . 2) (buffer-file-coding-system . utf-8-unix) (insert-tabs-mode))))
  '(vc-handled-backends nil))
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(default ((default (:height 100 :family "Monaco")) (nil nil))))
