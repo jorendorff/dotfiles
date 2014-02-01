@@ -8,7 +8,7 @@ export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
 # CVS setings
 export CVS_RSH=ssh
 
-export JS="$HOME/dev/mi/js/src/r-objdir/js -m -n"
+export JS="$HOME/dev/mi/js/src/d-objdir/dist/bin/js"
 
 # What you say when your tests fail:
 function rats() {

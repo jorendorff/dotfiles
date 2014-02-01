@@ -15,7 +15,7 @@ if os.path.basename(os.getcwd()) != "src":
         sys.exit(1)
     os.chdir(srcdir)
 
-DIST = "../../obj-x86_64-apple-darwin12.4.0/dist"
+FF_DIST = "../../obj-x86_64-apple-darwin12.4.0/dist"
 
 isWin = platform.system() == "Microsoft"
 isMac = platform.system() == "Darwin"
@@ -71,7 +71,7 @@ class Variant:
             assert 'd' in id
             cflags += ['-fprofile-arcs', '-ftest-coverage']
 
-        dist = os.path.abspath(DIST)
+        dist = os.path.abspath(FF_DIST)
         args += ['--enable-threadsafe',
                  '--with-nspr-cflags=-I' + dist + '/include/nspr',
                  '--with-nspr-libs=-L' + dist + '/lib -lnspr4']
@@ -117,14 +117,15 @@ class Variant:
         cmd(["make", "-j4"] + self.makeArgs, cwd=objdir)
 
         # "local install"
+        bindir = os.path.join(objdir, "dist", "bin")
         for filename in ("libnss3.dylib", "libmozglue.dylib"):
-            lib = os.path.join(objdir, filename)
+            lib = os.path.join(bindir, filename)
             if not os.path.isfile(lib) and not os.path.islink(lib):
-                # extra .. to get out of objdir
-                os.symlink(os.path.join('..', DIST, 'bin', filename), lib)
+                # extra ..s to get out of objdir
+                os.symlink(os.path.join('..', '..', '..', FF_DIST, 'bin', filename), lib)
 
         # smoketest
-        js = os.path.join(objdir, 'js')
+        js = os.path.join(bindir, 'js')
         cmd([js, 'Y.js'])
         if self.hasGcZeal:
             cmd([js, '-e', 'gczeal(2)', 'Y.js'])

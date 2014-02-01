@@ -10,11 +10,15 @@ else
     SRCDIR=`hg root`/js/src
     OBJDIR=$SRCDIR/d-objdir
 fi
-JS="$OBJDIR/js"
+
+BINDIR="$OBJDIR"
+if [ -d "$BINDIR/js" ]; then
+    BINDIR="$BINDIR/dist/bin"
+fi
+JS="$BINDIR/js"
 
 if [ $# == 0 ]; then
-    cd "$OBJDIR/jsapi-tests"
-    #./jsapi-tests
+    "$BINDIR/jsapi-tests"
 fi
 
 cd "$SRCDIR/jit-test"
