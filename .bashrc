@@ -2,8 +2,8 @@
 # This causes the PATH to get longer and longer as we nest interactive shells, alas.
 export PATH=/usr/local/bin:${PATH}
 export PATH=${PATH}:${HOME}/prefix/bin:${HOME}/bin:${HOME}/dev/dotfiles/myscripts
-export PATH=${PATH}:/usr/local/share/python
 export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
+export PATH=${PATH}:$HOME/.cabal/bin
 
 # CVS setings
 export CVS_RSH=ssh
@@ -51,6 +51,10 @@ else
     # long command output.  Add qtop too.
     export PS1='\[\e[1m\]\w`mercurial-qtop`\$\[\e[0m\] '
 fi
+
+function snappy() {
+    export PS1='\[\e[1m\]\w\$\[\e[0m\] '
+}
 
 alias hg-try='hg st -mard | grep . && echo abort: uncommitted changes! || hg push -f ssh://hg.mozilla.org/try/'
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
