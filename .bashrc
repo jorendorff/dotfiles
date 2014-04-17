@@ -1,3 +1,8 @@
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
 # Add custom builds directory, then MacPorts install directory; also ~/prefix/bin and ~/bin.
 # This causes the PATH to get longer and longer as we nest interactive shells, alas.
 export PATH=/usr/local/bin:${PATH}
@@ -9,11 +14,6 @@ export PATH=${PATH}:$HOME/.cabal/bin
 export CVS_RSH=ssh
 
 export JS="$HOME/dev/mi/js/src/d-objdir/dist/bin/js"
-
-# What you say when your tests fail:
-function rats() {
-    ls "`hg root`/js/tests"/results-*.html | tail -n 1 | xargs open
-}
 
 function bug() {
     open "http://bugzilla.mozilla.org/show_bug.cgi?id=$@"
