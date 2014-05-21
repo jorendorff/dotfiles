@@ -138,7 +138,8 @@ class Variant:
 def autoconf(runcmd):
     if (not os.path.exists('configure')
         or os.path.getmtime('configure') <= os.path.getmtime('configure.in')):
-        script(runcmd, ['autoconf213'])
+        autoconf = 'autoconf213' if isMac else 'autoconf-2.13'
+        script(runcmd, [autoconf])
 
 def script(runcmd, command, **kwargs):
     if isWin:
