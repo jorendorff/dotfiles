@@ -166,24 +166,50 @@ def showCommand(command, cwd=None, env=None, stdout=None):
     print(" ".join(stuff))
 
 def runCommandVerbose(*args, **kwargs):
+    discard_stdout = kwargs.pop("discard_stdout", False)
+    with_colout = args[0][0] == "make"
+
     print ">>> ",
     showCommand(*args, **kwargs)
-    return subprocess.check_call(*args, **kwargs)
 
-def runCommand(*args, **kwargs):
-    if os.name == 'posix':
-        f = open("/dev/null", "w")
-    elif os.name == 'nt':
-        f = open("nul:", "w")
+    sink = None
+    if discard_stdout:
+        if os.name == 'posix':
+            sink = open("/dev/null", "w")
+        elif os.name == 'nt':
+            sink = open("nul:", "w")
+        else:
+            discard_stdout = False
+
+    if with_colout:
+        destination = subprocess.PIPE
     else:
-        f = None  # no redirection
-    kwargs['stdout'] = f
+        destination = None  # no redirection
+
+    if discard_stdout:
+        kwargs['stdout'] = sink
+        kwargs['stderr'] = destination
+    else:
+        kwargs['stdout'] = destination
+        kwargs['stderr'] = subprocess.STDOUT
 
     try:
-        runCommandVerbose(*args, **kwargs)
+        p = subprocess.Popen(*args, **kwargs)
+        if with_colout:
+            output_pipe = p.stderr if discard_stdout else p.stdout
+            p = subprocess.Popen(["colout", ": (error):", "red"], stdin=output_pipe,
+                                 stdout=subprocess.PIPE)
+            p = subprocess.Popen(["colout", ": (warning):", "#ff8000"], stdin=p.stdout)
+        returncode = p.wait()
+        if returncode != 0:
+            raise subprocess.CalledProcessError(returncode, args)
+        return returncode
     finally:
-        if f is not None:
-            f.close()
+        if sink is not None:
+            sink.close()
+
+def runCommand(*args, **kwargs):
+    return runCommandVerbose(*args, discard_stdout=True, **kwargs)
 
 def main():
     if isMac and sys.version_info < (2, 5, 2):

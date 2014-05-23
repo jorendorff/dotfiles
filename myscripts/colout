@@ -1,0 +1,10 @@
+#!/bin/bash
+# Copyright (c) 2013 Martin Ueding <dev@martin-ueding.de>
+
+# Small launcher script for the main module.
+
+# Licence: GPL 3
+
+set -e   # can't use -u as virtualenv isn't careful enough
+
+(cd $HOME/dev/colout && . venv/bin/activate && python -m colout.colout "$@")
