@@ -4,11 +4,16 @@ export PATH=/usr/local/bin:${PATH}
 export PATH=${PATH}:${HOME}/prefix/bin:${HOME}/bin:${HOME}/dev/dotfiles/myscripts
 export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
 export PATH=${PATH}:$HOME/.cabal/bin
+export PATH=${PATH}:/usr/local/share/python  # virtualenv
 
 # CVS setings
 export CVS_RSH=ssh
 
 export JS="$HOME/dev/mi/js/src/d-objdir/dist/bin/js"
+
+function activate() {
+    . ./venv/bin/activate
+}
 
 # What you say when your tests fail:
 function rats() {
