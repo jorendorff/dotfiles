@@ -1,6 +1,8 @@
 (require 'package)
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 
 (column-number-mode t)
@@ -16,8 +18,19 @@
 (global-set-key "\M-." 'etags-select-find-tag)
 (visit-tags-table "~/dev/mi/TAGS")
 
+(require 'cl)
+
+(defun gcr/plist-to-alist (ls)
+  "Convert a plist to an alist. Primarily for old color-theme themes."
+  (let ((result nil))
+    (while ls
+      (add-to-list 'result (cons (car ls) (cadr ls)))
+      (setq ls (cddr ls)))
+    result))
+(defalias 'plist-to-alist 'gcr/plist-to-alist)
+
 ;;(require 'color-theme-solarized)
-;;(color-theme-solarized-light)
+;;(color-theme-solarized-dark)
 
 (require 'vc-hg)
 ;;(require 'mercurial-queues)
@@ -141,7 +154,7 @@
 	      (string-match-p "Adobe AS3" chunk))
 	(progn (c-set-style "adobe-c++")
 	       (setq tab-width adobe-tab-width))
-      (progn (c-set-style "stroustrup")
+      (progn (c-set-style "sfink")
 	     (setq indent-tabs-mode nil)))))
 
 (add-hook 'c-mode-common-hook (function adobe-code-hook))
@@ -220,12 +233,19 @@
 (define-key global-map "\M-_" 'insert-mdash)
 
 
-;; Erlang goofs.
-
-(setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
-(setq erlang-root-dir "/usr/local/lib/erlang")
-(setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
-(require 'erlang-start)
+;; Create sfink's personal style.
+(defconst sfink-c-style
+  '((c-basic-offset             . 4)
+    (c-offsets-alist            . ((substatement-open . 0)
+                                   (case-label        . /)
+                                   (member-init-intro . *)
+                                   (innamespace       . 0)
+                                   (inline-open       . 0)
+                                   (func-decl-cont    . 0)
+                                   (access-label      . /)))
+    (c-echo-syntactic-information-p . t))
+  "sfink's C Programming Style")
+(c-add-style "sfink" sfink-c-style)
 
 
 ;; Custom.
