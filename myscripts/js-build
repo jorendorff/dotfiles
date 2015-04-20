@@ -15,12 +15,12 @@ if os.path.basename(os.getcwd()) != "src":
         sys.exit(1)
     os.chdir(srcdir)
 
-FF_DIST = "../../obj-x86_64-apple-darwin12.4.0/dist"
+FF_DIST = "../../obj-x86_64-apple-darwin13.1.0/dist"
 
 isWin = platform.system() == "Microsoft"
 isMac = platform.system() == "Darwin"
 isGCC = not isWin
-haveValgrind = not isWin and not isMac
+haveValgrind = not isWin
 
 class Variant:
     def __init__(self, id):
