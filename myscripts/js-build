@@ -15,7 +15,7 @@ if os.path.basename(os.getcwd()) != "src":
         sys.exit(1)
     os.chdir(srcdir)
 
-FF_DIST = "../../obj-x86_64-apple-darwin12.4.0/dist"
+FF_DIST = "../../obj-x86_64-unknown-linux-gnu/dist"
 
 isWin = platform.system() == "Microsoft"
 isMac = platform.system() == "Darwin"
@@ -36,15 +36,15 @@ class Variant:
         self.dry_run = False
         self.hasGcZeal = 'd' in id
 
-        if re.match(r'^[rd]x?j?c?(?:32)?$', id) is None:
+        if re.match(r'^o?[rdA]j?c?(?:32)?$', id) is None:
             raise ValueError("Unrecognized variant " + id)
 
-        args = ['--enable-readline', '--enable-sm-fail-on-warnings']
+        args = ['--enable-readline']
         cflags = []
         makeArgs = []
         env = {}
 
-        if '32' in id and not isMac:
+        if '32' in id and not (isMac or isLinux):
             raise ValueError("combination not supported")
 
         if isWin:
@@ -64,28 +64,51 @@ class Variant:
                     env['CROSS_COMPILE'] = '1'
                     env['CC'] += ' -arch i386'
                     env['CXX'] += ' -arch i386'
+            if isLinux and '32' in id:
+                env['PKG_CONFIG_LIBDIR'] = '/usr/lib/pkgconfig'
+                env['CC'] = 'gcc -m32'
+                env['CXX'] = 'g++ -m32'
+                env['AR'] = 'ar'
+                args += ['--target=i686-pc-linux']
 
         if 'd' in id:
-            args += ['--disable-optimize']
+            assert 'A' not in id
+            args += ['--disable-optimize']  # note that 'o' overrides this
             if isGCC:
                 args += ['--enable-debug=-g3']
             else:
                 args += ['--enable-debug']
             if haveValgrind:
                 args += ['--enable-valgrind']
+        elif 'A' in id:
+            # Address sanitizer
+            assert isLinux
+            assert '32' not in id
+            args += ['--enable-address-sanitizer', '--enable-debug-symbols', '--disable-threadsafe', '--disable-debug', '--enable-optimize=-O2 -g', '--enable-gczeal', '--enable-valgrind']
+            env['LDFLAGS'] = "-fsanitize=address"
         else:
             args += ['--enable-debug-symbols']
+
+        if 'o' in id:
+            # optimized debug build
+            if 'd' not in id:
+                raise ValueError("o must be omitted when building non-debug; "
+                                 "all non-debug builds are optimized automatically")
+            i = args.index('--disable-optimize')
+            args[i] = '--enable-optimize'
+
         if 'c' in id:
             assert 'd' in id
             cflags += ['-fprofile-arcs', '-ftest-coverage']
 
-        dist = os.path.abspath(FF_DIST)
-        args += ['--enable-threadsafe', '--with-posix-nspr-emulation']
-        ## args += ['--enable-ctypes']  # requires a real nspr
+        ## # '--with-posix-nspr-emulation' is awesome but it conflicts with ctypes
+        ## dist = os.path.abspath(FF_DIST)
+        ## nspr_include_dir = os.path.join(dist, "include", "nspr")
+        ## nspr_lib_dir = os.path.join(dist, "lib")
+        ## args += ['--with-nspr-cflags=-I' + nspr_include_dir,
+        ##          '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
+        ## args += ['--enable-ctypes']
 
-        if 'x' in id:
-            args += ['--disable-tracejit']
-            makeArgs += ['ENABLE_JIT=']
         if 'j' in id:
             args += ['--enable-jemalloc']
 
@@ -99,7 +122,7 @@ class Variant:
         self.makeArgs = makeArgs
 
     def build(self, cmd):
-        objdir = self.id + "-objdir"
+        objdir = self.id + "-obj"
 
         # configure
         cmd(["mkdir", "-p", objdir])
@@ -119,7 +142,7 @@ class Variant:
             cmd(['touch', config_ts])
 
         # build
-        cmd(["make", "-j4"] + self.makeArgs, cwd=objdir)
+        cmd(["make", "-j9"] + self.makeArgs, cwd=objdir)
 
         # "local install"
         bindir = os.path.join(objdir, "dist", "bin")
@@ -146,8 +169,6 @@ def script(runcmd, command, **kwargs):
         command = ["bash"] + command
     return runcmd(command, **kwargs)
 
-allVariants = [_r + _x for _x in ('', 'x') for _r in ('r', 'd')]
-
 def showCommand(command, cwd=None, env=None, stdout=None):
     """ Print the shell command line you could use to run the given command. """
     def quote(arg):
@@ -167,7 +188,7 @@ def showCommand(command, cwd=None, env=None, stdout=None):
 
 def runCommandVerbose(*args, **kwargs):
     discard_stdout = kwargs.pop("discard_stdout", False)
-    with_colout = args[0][0] == "make"
+    with_colout = os.environ.get('EMACS') != 't' and sys.stdout.isatty() and args[0][0] == "make"
 
     print ">>> ",
     showCommand(*args, **kwargs)
@@ -194,13 +215,14 @@ def runCommandVerbose(*args, **kwargs):
         kwargs['stderr'] = subprocess.STDOUT
 
     try:
-        p = subprocess.Popen(*args, **kwargs)
+        p = last = subprocess.Popen(*args, **kwargs)
         if with_colout:
-            output_pipe = p.stderr if discard_stdout else p.stdout
-            p = subprocess.Popen(["colout", ": (error):", "red"], stdin=output_pipe,
+            output_pipe = last.stderr if discard_stdout else last.stdout
+            last = subprocess.Popen(["colout", ": (error):", "red"], stdin=output_pipe,
                                  stdout=subprocess.PIPE)
-            p = subprocess.Popen(["colout", ": (warning):", "#ff8000"], stdin=p.stdout)
-        returncode = p.wait()
+            last = subprocess.Popen(["colout", ": (warning):", "#ff8000"], stdin=last.stdout)
+        returncode = p.wait()  # get the exit code of the original process
+        last.wait()            # but also wait for colout to be done
         if returncode != 0:
             raise subprocess.CalledProcessError(returncode, args)
         return returncode
@@ -212,17 +234,13 @@ def runCommand(*args, **kwargs):
     return runCommandVerbose(*args, discard_stdout=True, **kwargs)
 
 def main():
-    if isMac and sys.version_info < (2, 5, 2):
-        sys.stderr.write("js-build: WARNING: Due to COMMAND_MODE madness, this can fail on Leopard!\n"
-                         "js-build:          Workaround is to upgrade to Python 2.5.2 or later.\n")
-
     import optparse
     p = optparse.OptionParser(usage="usage: %prog [-nv] [-V variants]")
     p.add_option("-v", "--verbose",
                  dest="verbose", action="store_true", default=False,
                  help="Print stdout from commands, not just stderr.")
     p.add_option("-V", "--variants",
-                 dest="variants", default="d",
+                 dest="variants", default="od",
                  help="which variants to build")
     p.add_option("-n", "--dry-run",
                  dest="dry_run", action="store_true", default=False,
@@ -256,5 +274,3 @@ if __name__ == '__main__':
         if say:
             subprocess.Popen(say + ["fail"])
         raise
-
-        
