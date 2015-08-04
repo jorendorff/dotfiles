@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# To use this, put a test script in js/src/crasher.js and run:
+# To use this, put a test script in js/src/test.js and run:
 #   hg bisect -c js-bisector
 
 set -eu
@@ -14,8 +14,8 @@ cd $HGROOT/js/src || exit 127
 
 echo "building revision $HGREV in $HGROOT/js/src"
 (js-build -V d > /dev/null) \
-     || (rm -r d-objdir && js-build -V d > /dev/null) \
+     || (rm -r d-obj && js-build -V d > /dev/null) \
      || exit 127
 
 echo "running test"
-./d-objdir/js $JSFLAGS asserter.js
+./d-obj/dist/bin/js $JSFLAGS test.js
