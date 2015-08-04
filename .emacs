@@ -11,12 +11,24 @@
 
 (tool-bar-mode 0)  ;; no nasty tool-bar!
 
+(visit-tags-table "~/dev/gecko/TAGS")
+
 (require 'etags-select)
 (global-set-key "\M-?" 'etags-select-find-tag-at-point)
 (global-set-key "\M-." 'etags-select-find-tag)
 
-;;(require 'color-theme-solarized)
-;;(color-theme-solarized-light)
+;; blessed silence
+(setq ring-bell-function 'ignore)
+;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
+(global-set-key [mouse-6] (function (lambda () (interactive) nil)))
+(global-set-key [mouse-7] (function (lambda () (interactive) nil)))
+
+;; this is busted in Emacs 24.3.1, but it mostly works. squelch the error.
+(require 'color-theme-solarized)
+(condition-case ex
+    (color-theme-solarized-light)
+  ('error nil)
+  nil)
 
 (require 'vc-hg)
 ;;(require 'mercurial-queues)
@@ -54,6 +66,26 @@
 (global-set-key [?\C-~] 'previous-error)
 (global-set-key "\M-gr" 'grep)
 (global-set-key "\M-q"  'fill-paragraph)
+
+(defun select-all ()
+  (interactive "")
+  (set-mark (point-min))
+  (goto-char (point-max)))
+(global-set-key [(super ?a)] 'select-all)
+
+(defun js-debug ()
+  (interactive "")
+  (gud-gdb "gdb --fullname --args /home/jorendorff/dev/gecko/js/src/d-objdir/dist/bin/js -f /home/jorendorff/dev/gecko/js/src/tmp.js"))
+
+(global-set-key [(super ?g)] 'gud-gdb)
+(global-set-key [(super shift ?g)] 'js-debug)
+(global-set-key [(super ?b)] 'gud-break)
+(global-set-key [(super ?s)] 'gud-step)
+(global-set-key [(super ?n)] 'gud-next)
+(global-set-key [(super ?f)] 'gud-finish)
+(global-set-key [(super ?c)] 'gud-cont)
+(global-set-key [(super ?r)] 'gud-run)
+;; todo: [(super ?k)] to kill debuggee
 
 ;; C-< and C->
 (defun indent-rigidly-4 (start end)
@@ -143,7 +175,9 @@
   (interactive)
   (set-buffer-file-coding-system 'unix))
 
-(defconst dev-directory "/Users/jorendorff/dev")
+
+
+(defconst dev-directory (concat (getenv "HOME") "/dev"))
 
 (defun review ()
   (interactive)
@@ -194,19 +228,19 @@
 
 ;; HTML entities (key bindings chosen to match MacOS defaults)
 
-(defun insert-ldquo () (interactive) (insert "&ldquo;"))
+(defun insert-ldquo () (interactive) (insert "“"))
 (define-key global-map "\M-[" 'insert-ldquo)
 
-(defun insert-rdquo () (interactive) (insert "&rdquo;"))
+(defun insert-rdquo () (interactive) (insert "”"))
 (define-key global-map "\M-{" 'insert-rdquo)
 
-(defun insert-lsquo () (interactive) (insert "&lsquo;"))
+(defun insert-lsquo () (interactive) (insert "‘"))
 (define-key global-map "\M-]" 'insert-lsquo)
 
-(defun insert-rsquo () (interactive) (insert "&rsquo;"))
+(defun insert-rsquo () (interactive) (insert "’"))
 (define-key global-map "\M-}" 'insert-rsquo)
 
-(defun insert-mdash () (interactive) (insert "&mdash;"))
+(defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
 
 
@@ -236,4 +270,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((default (:height 100 :family "Monaco")) (nil nil))))
+ '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "#657b83" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 85 :width normal :foundry "unknown" :family "VL Gothic")))))
