@@ -1,7 +1,7 @@
 [ui]
 username=Jason Orendorff <jorendorff@mozilla.com>
 merge=internal:merge
-ignore=/Users/jorendorff/.hgignore
+ignore=~/.hgignore
 
 [defaults]
 diff=-U 8 -p

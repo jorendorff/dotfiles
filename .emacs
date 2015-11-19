@@ -16,7 +16,6 @@
 (require 'etags-select)
 (global-set-key "\M-?" 'etags-select-find-tag-at-point)
 (global-set-key "\M-." 'etags-select-find-tag)
-(visit-tags-table "~/dev/mi/TAGS")
 
 (require 'cl)
 
@@ -88,15 +87,6 @@
   (interactive "")
   (select-frame (make-frame))
   (set-background-color "#e0ecf8"))
-
-(defun reset-frames ()
-  (let ((old-frames (frame-list))
-	(new-frames '(((width . 80) (height . 150)))))
-    (dolist (params new-frames) (make-frame params))
-    (dolist (f old-frames) (delete-frame f))))
-
-(if (display-mouse-p)
-    (reset-frames))
 
 ;; Wheeeee!
 (server-start)
@@ -247,6 +237,13 @@
   "sfink's C Programming Style")
 (c-add-style "sfink" sfink-c-style)
 
+;; Erlang goofs.
+
+(setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
+(setq erlang-root-dir "/usr/local/lib/erlang")
+(setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
+(require 'erlang-start)
+
 
 ;; Custom.
 
@@ -261,6 +258,7 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
+ '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
  '(paren-match-face (quote paren-face-match-light))

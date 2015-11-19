@@ -30,6 +30,13 @@ elif isLinux:
 else:
     say = None
 
+if isMac:
+    say = ["say"]
+elif isLinux:
+    say = ["espeak", "-v", "en-us"]
+else:
+    say = None
+
 class Variant:
     def __init__(self, id):
         self.id = id
@@ -80,11 +87,8 @@ class Variant:
             cflags += ['-fprofile-arcs', '-ftest-coverage']
 
         dist = os.path.abspath(FF_DIST)
-        args += ['--enable-threadsafe',
-                 '--with-nspr-cflags=-I' + dist + '/include/nspr',
-                 '--with-nspr-libs=-L' + dist + '/lib -lnspr4']
-        ##args += ['--enable-threadsafe', '--with-system-nspr']
-        args += ['--enable-ctypes']
+        args += ['--enable-threadsafe', '--with-posix-nspr-emulation']
+        ## args += ['--enable-ctypes']  # requires a real nspr
 
         if 'x' in id:
             args += ['--disable-tracejit']
