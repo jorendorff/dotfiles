@@ -19,8 +19,16 @@ FF_DIST = "../../obj-x86_64-apple-darwin13.1.0/dist"
 
 isWin = platform.system() == "Microsoft"
 isMac = platform.system() == "Darwin"
+isLinux = platform.system() == "Linux"
 isGCC = not isWin
 haveValgrind = not isWin
+
+if isMac:
+    say = ["say"]
+elif isLinux:
+    say = ["espeak", "-v", "en-us"]
+else:
+    say = None
 
 class Variant:
     def __init__(self, id):
@@ -214,15 +222,15 @@ def main():
     for v in variants:
         v.build(runcmd)
 
-    if isMac:
-        runcmd(["say", "build complete"])
+    if say:
+        runcmd(say + ["build complete"])
 
 if __name__ == '__main__':
     try:
         main()
     except:
-        if isMac:
-            subprocess.Popen(["say", "fail"])
+        if say:
+            subprocess.Popen(say + ["fail"])
         raise
 
         
