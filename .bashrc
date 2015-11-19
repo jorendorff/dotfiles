@@ -67,3 +67,5 @@ alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"g
 alias clojure="java -Xms64m -Xmx1g -cp $HOME/dev/clojure/clojure-1.3.0/clojure-1.3.0.jar clojure.main"
 export CVS_RSH=ssh
 ##export JAVA_HOME=`/usr/libexec/java_home`
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
