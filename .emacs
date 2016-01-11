@@ -1,10 +1,24 @@
 (require 'package)
 (add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
+             '("marmalade" . "https://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 
 (column-number-mode t)
 (show-paren-mode t)
+
+;; Enable company globally for all modes
+;;(global-company-mode)
+;;
+;; Reduce the time after which the company autocomplete popup opens
+;;(setq company-idle-delay 0.2)
+;;
+;; Reduce the number of characters before company kicks in
+;;(setq company-minimum-prefix-length 1)
+
+;; Set path to racer binary
+
 
 (add-to-list 'load-path "~/dev/dotfiles/.emacs.d/my-site-lisp")
 (add-to-list 'load-path "~/dev/mozilla-elisp")
@@ -34,6 +48,16 @@
 ;;(require 'mercurial-queues)
 (require 'page-ext)
 
+;; Structural editing ftw! Thanks Scot!
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+
 (push "/opt/local/share/emacs/site-lisp" load-path)
 (autoload 'gid "idutils" nil t)
 
@@ -51,6 +75,9 @@
 ;; yay rust
 ;;(add-to-list 'load-path "~/dev/rust/src/etc/emacs/")
 ;;(require 'rust-mode)
+(add-hook 'rust-mode-hook
+          (function (lambda ()
+                      (setq-local electric-indent-chars (append '(?} ?\;) electric-indent-chars)))))
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -148,23 +175,15 @@
 
 (defconst adobe-tab-width 4)
 
+(defun javascript-code-hook ()
+  (setq indent-tabs-mode nil))
+
+(add-hook 'js-mode-hook (function javascript-code-hook))
+
 (defun adobe-code-hook ()
   ;; Install adobe-c++ style if not already installed...
-  (if (not (assoc "adobe-c++" c-style-alist))
-      (setq c-style-alist
-	    (cons
-	     `("adobe-c++" "stroustrup"
-	       (c-basic-offset . ,adobe-tab-width)
-	       (indent-tabs-mode . t))
-	     c-style-alist)))
-  ;; Now enable whichever C++ style is appropriate for this code.
-  (let ((chunk (buffer-substring 1 (+ 1 (min (buffer-size) 1500)))))
-    (if (or (string-match-p "Adobe System Inc" chunk)
-	      (string-match-p "Adobe AS3" chunk))
-	(progn (c-set-style "adobe-c++")
-	       (setq tab-width adobe-tab-width))
-      (progn (c-set-style "stroustrup")
-	     (setq indent-tabs-mode nil)))))
+  (progn (c-set-style "stroustrup")
+         (setq indent-tabs-mode nil)))
 
 (add-hook 'c-mode-common-hook (function adobe-code-hook))
 
@@ -234,6 +253,11 @@
 (defun insert-rdquo () (interactive) (insert "”"))
 (define-key global-map "\M-{" 'insert-rdquo)
 
+(defun markdown-mode-keymap-smackdown ()
+  (local-unset-key "\M-}")
+  (local-unset-key "\M-{"))
+(add-hook 'markdown-mode-hook 'markdown-mode-keymap-smackdown)
+
 (defun insert-lsquo () (interactive) (insert "‘"))
 (define-key global-map "\M-]" 'insert-lsquo)
 
@@ -242,7 +266,6 @@
 
 (defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
-
 
 ;; Custom.
 

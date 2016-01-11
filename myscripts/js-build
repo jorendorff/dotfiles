@@ -101,13 +101,12 @@ class Variant:
             assert 'd' in id
             cflags += ['-fprofile-arcs', '-ftest-coverage']
 
-        ## # '--with-posix-nspr-emulation' is awesome but it conflicts with ctypes
-        ## dist = os.path.abspath(FF_DIST)
-        ## nspr_include_dir = os.path.join(dist, "include", "nspr")
-        ## nspr_lib_dir = os.path.join(dist, "lib")
-        ## args += ['--with-nspr-cflags=-I' + nspr_include_dir,
-        ##          '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
-        ## args += ['--enable-ctypes']
+        dist = os.path.abspath(FF_DIST)
+        nspr_include_dir = os.path.join(dist, "include", "nspr")
+        nspr_lib_dir = os.path.join(dist, "lib")
+        args += ['--with-nspr-cflags=-I' + nspr_include_dir,
+                 '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
+        args += ['--enable-ctypes']
 
         if 'j' in id:
             args += ['--enable-jemalloc']

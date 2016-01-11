@@ -10,3 +10,4 @@ ID
 .mozconfig-*
 *.pyc
 *.pyo
+builddir
