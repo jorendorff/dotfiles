@@ -70,13 +70,17 @@ function mach() {
 
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
 alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"gdb \" \\$11 \" \" \\$2}"`'
-alias clojure="java -Xms64m -Xmx1g -cp $HOME/dev/clojure/clojure-1.3.0/clojure-1.3.0.jar clojure.main"
 export CVS_RSH=ssh
 ##export JAVA_HOME=`/usr/libexec/java_home`
 
-alias ffcal='~/apps/firefox/firefox -no-remote -P cal &'
-alias ffdefault='firefox -no-remote -P default &'  # use shipping ff to avoid okta freeze
-alias ffrefuge='~/apps/firefox/firefox -no-remote -P refuge &'
-alias ffall='ffcal; ffdefault; ffrefuge'
+alias ffc='~/apps/firefox/firefox -no-remote -P cal'
+alias ffd='firefox -no-remote -P default'  # use shipping ff to avoid okta freeze
+alias ffr='~/apps/firefox/firefox -no-remote -P refuge'
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/rustlib/x86_64-unknown-linux-gnu/lib
+export CCACHE_COMPRESS=""
+export PATH="/usr/local/heroku/bin:$PATH"
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
