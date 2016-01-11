@@ -1,0 +1,11 @@
+#!/bin/bash
+# rusteval: evaluate a rust expression
+
+set -eu
+
+cd ~/dev/rust-ignorance/playground
+rm -rf rusteval
+cargo new --bin rusteval --vcs none
+cd rusteval
+echo "fn main() { println!(\"{:?}\", $@); }" > src/main.rs
+cargo run | tail -n +3
