@@ -1,18 +1,30 @@
-echo "RUNNING: .bashrc"
-
 # Source global definitions
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# Add custom builds directory, then MacPorts install directory; also ~/prefix/bin and ~/bin.
-# This causes the PATH to get longer and longer as we nest interactive shells, alas.
-export PATH=/usr/local/bin:${PATH}
-export PATH=${PATH}:${HOME}/prefix/bin:${HOME}/bin:${HOME}/dev/dotfiles/myscripts
-export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
-export PATH=${PATH}:$HOME/.cabal/bin
+# Strip RVM directories out of PATH so that the rvm script later on will reinstate them
+# (RVM needs to be before /usr/local/bin in the PATH, but /usr/local/bin needs to be
+# before most other stuff...)
+export PATH=$(echo $PATH | sed 's/\(^\|:\)\([^:]*\/.rvm\/[^:]*:\)*/\1/g')
+export PATH=$(echo $PATH | sed 's/\(^\|:\)[^:]*\/.rvm\/[^:]*$//g')
 
-# CVS setings
+# Add custom builds directory, odds and ends.
+# Remove them first so PATH doesn't get longer and longer as we nest interactive shells.
+PATH=$(echo $PATH|sed 's/\(^\|:\)usr\/local\/bin:/\1/g')
+export PATH=/usr/local/bin:${PATH}
+for p in "${HOME}/prefix/bin" \
+             "${HOME}/bin" \
+             "${HOME}/dev/dotfiles/myscripts" \
+             "$HOME/dev/node_modules/docco/bin" \
+             "$HOME/.cabal/bin"; do
+    pr=$(echo "$p" | /usr/bin/sed 's/\//\\\//g')
+    PATH=$(echo "$PATH" | /usr/bin/sed 's/\(^\|:\)'"$pr"':/\1/g')
+    export PATH="${PATH}:${p}"
+done
+
+
+# CVS settings
 export CVS_RSH=ssh
 
 export JS="$HOME/dev/gecko/js/src/od-obj/dist/bin/js"
@@ -24,6 +36,10 @@ function bug() {
 
 function es6draft() {
     bash "$HOME/dev/es6draft/bin/es6draft" "$@"
+}
+
+function gg() {
+    git log --graph --all --decorate "$@"
 }
 
 function grep-c() {
@@ -70,6 +86,8 @@ function mach() {
 
 . ~/.nvm/nvm.sh
 
+alias rusti="(cd $HOME/dev/rusti && cargo run)"
+
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
 alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"gdb \" \\$11 \" \" \\$2}"`'
 export CVS_RSH=ssh
@@ -84,5 +102,4 @@ export CCACHE_COMPRESS=""
 export PATH="/usr/local/heroku/bin:$PATH"
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
