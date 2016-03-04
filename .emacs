@@ -1,15 +1,19 @@
-(require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/"))
-(package-initialize)
+;;(require 'package)
+;;(add-to-list 'package-archives
+;;             '("marmalade" . "http://marmalade-repo.org/packages/"))
+;;(add-to-list 'package-archives
+;;             '("melpa" . "http://melpa.milkbox.net/packages/"))
+;;(package-initialize)
 
 (column-number-mode t)
 (show-paren-mode t)
 
 (add-to-list 'load-path "~/dev/dotfiles/.emacs.d/my-site-lisp")
 (add-to-list 'load-path "~/dev/mozilla-elisp")
+
+(add-to-list 'load-path "~/dev/rust-mode/")
+(require 'rust-mode)
+(setq-default indent-tabs-mode nil)  ;; never insert tabs
 
 (tool-bar-mode 0)  ;; no nasty tool-bar!
 
@@ -31,7 +35,7 @@
 ;;(require 'color-theme-solarized)
 ;;(color-theme-solarized-dark)
 
-(require 'vc-hg)
+;;(require 'vc-hg)
 ;;(require 'mercurial-queues)
 (require 'page-ext)
 
@@ -39,19 +43,15 @@
 (autoload 'gid "idutils" nil t)
 
 ;; orgmode.org told me to put these lines in
-(require 'org-install)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
+;; (require 'org-install)
+;; (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;; (define-key global-map "\C-cl" 'org-store-link)
+;; (define-key global-map "\C-ca" 'org-agenda)
 
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
 (setq auto-mode-alist
       (cons '("\\.md" . markdown-mode) auto-mode-alist))
-
-;; yay rust
-;;(add-to-list 'load-path "~/dev/rust/src/etc/emacs/")
-;;(require 'rust-mode)
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -239,10 +239,10 @@
 
 ;; Erlang goofs.
 
-(setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
-(setq erlang-root-dir "/usr/local/lib/erlang")
-(setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
-(require 'erlang-start)
+;; (setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
+;; (setq erlang-root-dir "/usr/local/lib/erlang")
+;; (setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
+;; (require 'erlang-start)
 
 
 ;; Custom.
