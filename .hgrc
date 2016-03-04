@@ -1,39 +1,51 @@
 [ui]
-username=Jason Orendorff <jorendorff@mozilla.com>
-merge=internal:merge
-ignore=~/.hgignore
+username = Jason Orendorff <jorendorff@mozilla.com>
+merge = internal:merge
+ignore = ~/.hgignore
 
 [defaults]
-diff=-U 8 -p
-qdiff=-U 8
+diff = -U 8 -p
+qdiff = -U 8
 
 [diff]
-git=true
-showfunc=true
+git = 1
+showfunc = 1
+unified = 8
 
 [extensions]
-rebase=
-mq=
-churn=
-record=
-extdiff=
-patchbomb=
-graphlog=
-hgk=
-children=
+rebase = 
+mq = 
+churn = 
+record = 
+extdiff = 
+patchbomb = 
+graphlog = 
+hgk = 
+children = 
+color = 
+histedit = 
+reviewboard = /Users/jorendorff/.mozbuild/version-control-tools/hgext/reviewboard/client.py
+bzexport = /Users/jorendorff/.mozbuild/version-control-tools/hgext/bzexport
+bzpost = /Users/jorendorff/.mozbuild/version-control-tools/hgext/bzpost
+firefoxtree = /Users/jorendorff/.mozbuild/version-control-tools/hgext/firefoxtree
+bundleclone = /Users/jorendorff/.mozbuild/version-control-tools/hgext/bundleclone
+push-to-try = /Users/jorendorff/.mozbuild/version-control-tools/hgext/push-to-try
 
 [email]
-from=Jason Orendorff <jorendorff@mozilla.com>
+from = Jason Orendorff <jorendorff@mozilla.com>
 
 [smtp]
-host=smtp.gmail.com
-tls=True
-username=jason.orendorff@gmail.com
-password=tychob
+host = smtp.gmail.com
+tls = True
+username = jason.orendorff@gmail.com
+password = tychob
 
 [alias]
 try = push -f -rtip ssh://hg.mozilla.org/try
 
 [hooks]
 post-try = hg phase --force --draft "mq()"
-
+[hostfingerprints]
+bugzilla.mozilla.org = 7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17
+bitbucket.org = 46:de:34:e7:9b:18:cd:7f:ae:fd:8b:e3:bc:f4:1a:5e:38:d7:ac:24
+hg.mozilla.org = af:27:b9:34:47:4e:e5:98:01:f6:83:2b:51:c9:aa:d8:df:fb:1a:27
