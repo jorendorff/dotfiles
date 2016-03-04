@@ -1,12 +1,24 @@
-;;(require 'package)
-;;(add-to-list 'package-archives
-;;             '("marmalade" . "http://marmalade-repo.org/packages/"))
-;;(add-to-list 'package-archives
-;;             '("melpa" . "http://melpa.milkbox.net/packages/"))
-;;(package-initialize)
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "https://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/"))
+(package-initialize)
 
 (column-number-mode t)
 (show-paren-mode t)
+
+;; Enable company globally for all modes
+;;(global-company-mode)
+;;
+;; Reduce the time after which the company autocomplete popup opens
+;;(setq company-idle-delay 0.2)
+;;
+;; Reduce the number of characters before company kicks in
+;;(setq company-minimum-prefix-length 1)
+
+;; Set path to racer binary
+
 
 (add-to-list 'load-path "~/dev/dotfiles/.emacs.d/my-site-lisp")
 (add-to-list 'load-path "~/dev/mozilla-elisp")
@@ -16,6 +28,8 @@
 (setq-default indent-tabs-mode nil)  ;; never insert tabs
 
 (tool-bar-mode 0)  ;; no nasty tool-bar!
+
+(visit-tags-table "~/dev/gecko/TAGS")
 
 (require 'etags-select)
 (global-set-key "\M-?" 'etags-select-find-tag-at-point)
@@ -32,12 +46,32 @@
     result))
 (defalias 'plist-to-alist 'gcr/plist-to-alist)
 
-;;(require 'color-theme-solarized)
-;;(color-theme-solarized-dark)
+;; blessed silence
+(setq ring-bell-function 'ignore)
+;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
+(global-set-key [mouse-6] (function (lambda () (interactive) nil)))
+(global-set-key [mouse-7] (function (lambda () (interactive) nil)))
+
+;; this is busted in Emacs 24.3.1, but it mostly works. squelch the error.
+(require 'color-theme-solarized)
+(condition-case ex
+    (color-theme-solarized-light)
+  ('error nil)
+  nil)
 
 ;;(require 'vc-hg)
 ;;(require 'mercurial-queues)
 (require 'page-ext)
+
+;; Structural editing ftw! Thanks Scot!
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 
 (push "/opt/local/share/emacs/site-lisp" load-path)
 (autoload 'gid "idutils" nil t)
@@ -67,6 +101,26 @@
 (global-set-key [?\C-~] 'previous-error)
 (global-set-key "\M-gr" 'grep)
 (global-set-key "\M-q"  'fill-paragraph)
+
+(defun select-all ()
+  (interactive "")
+  (set-mark (point-min))
+  (goto-char (point-max)))
+(global-set-key [(super ?a)] 'select-all)
+
+(defun js-debug ()
+  (interactive "")
+  (gud-gdb "gdb --fullname --args /home/jorendorff/dev/gecko/js/src/d-objdir/dist/bin/js -f /home/jorendorff/dev/gecko/js/src/tmp.js"))
+
+(global-set-key [(super ?g)] 'gud-gdb)
+(global-set-key [(super shift ?g)] 'js-debug)
+(global-set-key [(super ?b)] 'gud-break)
+(global-set-key [(super ?s)] 'gud-step)
+(global-set-key [(super ?n)] 'gud-next)
+(global-set-key [(super ?f)] 'gud-finish)
+(global-set-key [(super ?c)] 'gud-cont)
+(global-set-key [(super ?r)] 'gud-run)
+;; todo: [(super ?k)] to kill debuggee
 
 ;; C-< and C->
 (defun indent-rigidly-4 (start end)
@@ -129,23 +183,15 @@
 
 (defconst adobe-tab-width 4)
 
+(defun javascript-code-hook ()
+  (setq indent-tabs-mode nil))
+
+(add-hook 'js-mode-hook (function javascript-code-hook))
+
 (defun adobe-code-hook ()
   ;; Install adobe-c++ style if not already installed...
-  (if (not (assoc "adobe-c++" c-style-alist))
-      (setq c-style-alist
-	    (cons
-	     `("adobe-c++" "stroustrup"
-	       (c-basic-offset . ,adobe-tab-width)
-	       (indent-tabs-mode . t))
-	     c-style-alist)))
-  ;; Now enable whichever C++ style is appropriate for this code.
-  (let ((chunk (buffer-substring 1 (+ 1 (min (buffer-size) 1500)))))
-    (if (or (string-match-p "Adobe System Inc" chunk)
-	      (string-match-p "Adobe AS3" chunk))
-	(progn (c-set-style "adobe-c++")
-	       (setq tab-width adobe-tab-width))
-      (progn (c-set-style "sfink")
-	     (setq indent-tabs-mode nil)))))
+  (progn (c-set-style "sfink")
+         (setq indent-tabs-mode nil)))
 
 (add-hook 'c-mode-common-hook (function adobe-code-hook))
 
@@ -156,7 +202,9 @@
   (interactive)
   (set-buffer-file-coding-system 'unix))
 
-(defconst dev-directory "/Users/jorendorff/dev")
+
+
+(defconst dev-directory (concat (getenv "HOME") "/dev"))
 
 (defun review ()
   (interactive)
@@ -207,19 +255,24 @@
 
 ;; HTML entities (key bindings chosen to match MacOS defaults)
 
-(defun insert-ldquo () (interactive) (insert "&ldquo;"))
+(defun insert-ldquo () (interactive) (insert "“"))
 (define-key global-map "\M-[" 'insert-ldquo)
 
-(defun insert-rdquo () (interactive) (insert "&rdquo;"))
+(defun insert-rdquo () (interactive) (insert "”"))
 (define-key global-map "\M-{" 'insert-rdquo)
 
-(defun insert-lsquo () (interactive) (insert "&lsquo;"))
+(defun markdown-mode-keymap-smackdown ()
+  (local-unset-key "\M-}")
+  (local-unset-key "\M-{"))
+(add-hook 'markdown-mode-hook 'markdown-mode-keymap-smackdown)
+
+(defun insert-lsquo () (interactive) (insert "‘"))
 (define-key global-map "\M-]" 'insert-lsquo)
 
-(defun insert-rsquo () (interactive) (insert "&rsquo;"))
+(defun insert-rsquo () (interactive) (insert "’"))
 (define-key global-map "\M-}" 'insert-rsquo)
 
-(defun insert-mdash () (interactive) (insert "&mdash;"))
+(defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
 
 
@@ -271,4 +324,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((default (:height 100 :family "Monaco")) (nil nil))))
+ '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "#657b83" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 85 :width normal :foundry "unknown" :family "VL Gothic")))))

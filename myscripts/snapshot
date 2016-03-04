@@ -18,12 +18,37 @@ def hg(*args):
         sys.exit(2)
     return output, p.returncode
 
-# figure out a filename
-name, rc = hg('qtop')
-name = name.strip()
+# determine if we're using MQ
+rootdir, rc = hg('root')
+rootdir = rootdir.rstrip()
 if rc != 0:
-    print >>sys.stderr, name
+    print >>sys.stderr, rootdir
     sys.exit(rc)
+mq_status_file = os.path.join(rootdir, '.hg', 'patches', 'status')
+using_mq = os.path.exists(mq_status_file) and os.path.getsize(mq_status_file) > 0
+
+# figure out a filename
+if using_mq:
+    DIE
+    name, rc = hg('qtop')
+    name = name.strip()
+    if rc != 0:
+        print >>sys.stderr, name
+        sys.exit(rc)
+else:
+    bookmarks_current_file = os.path.join(rootdir, '.hg', 'bookmarks.current')
+    if not os.path.exists(bookmarks_current_file):
+        print >>sys.stderr, "You aren't using MQ and you aren't using bookmarks. Don't know how to name the patch."
+        sys.exit(1)
+    with open(bookmarks_current_file) as f:
+        name = f.read()
+    if '/' in name:
+        name = name[name.rindex('/') + 1:]
+    if not name:
+        print >> sys.stderr, "Empty bookmarks.current, don't know how to proceed."
+        sys.exit(1)
+
+# make sure the filename is unique and ends with .patch
 if name.endswith('.patch'):
     name = name[:-6]
 for i in range(1, 1000):
@@ -48,15 +73,22 @@ else:
     sys.exit(1)
 
 # dump patch to file
-patch, rc = hg('qdiff')
+header, rc = hg('export')
 if rc != 0:
     sys.exit(rc)
-f = open(filename, 'w')
-f.write(patch)
-f.close()
+header, _, _ = header.partition("\n\ndiff")
+header += "\n"
+if using_mq:
+    patch, rc = hg('qdiff')
+else:
+    patch, rc = hg('diff', '-r', '.^')
+if rc != 0:
+    sys.exit(rc)
+with open(filename, 'w') as f:
+    f.write(header + "\n" + patch)
 
 # and review it, why not
-os.system('${PAGER-more} ' + filename)
+os.system('${PAGER-less} ' + filename)
 
 print
 print filename

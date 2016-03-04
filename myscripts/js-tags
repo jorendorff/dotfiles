@@ -2,9 +2,9 @@
 
 set -eu
 
-# Exuberant ctags, installed via homebrew on OS X
-CTAGS=/usr/local/bin/ctags
+# Exuberant ctags, installed via homebrew on OS X (/usr/local/bin/ctags there)
+CTAGS=ctags
 
 JSDIR=`hg root`
 cd "$JSDIR"
-find js nsprpub mfbt \( -name '*-objdir' -prune \) -o \( -name '*.c' -o -name '*.cpp' -o -name '*.h' \) -print | xargs $CTAGS -e
+find js nsprpub mfbt \( -name '*-obj' -prune \) -o \( -name '*.c' -o -name '*.cpp' -o -name '*.h' \) -print | xargs $CTAGS -e

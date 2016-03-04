@@ -12,3 +12,5 @@
 
 [merge]
         conflictstyle = diff3
+[color]
+	ui = auto
