@@ -85,6 +85,12 @@ function mach() {
     `hg root`/mach "$@"
 }
 
+export WORDCOUNT_FILE=closures.md
+export WORDCOUNT_REV=`cd ~/dev/rustbook/atlas && git rev-parse HEAD`
+function wordcount() {
+    echo $((`cat $WORDCOUNT_FILE | wc -w` - `git show $WORDCOUNT_REV:$WORDCOUNT_FILE | wc -w`))
+}
+
 . ~/.nvm/nvm.sh
 
 alias rusti="(cd $HOME/dev/rusti && cargo run)"
