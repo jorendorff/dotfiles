@@ -63,9 +63,10 @@ function minefield-release() {
 if [ "$TERM" == dumb ]; then
     export PS1='\w\$ '
 else
-    # Show prompt in bold to make it easier to find the beginning/end of
+    # Long line of yellow equal signs, and prompt in bold.
+    # All this is just to make it easier to find the beginning/end of
     # long command output.
-    export PS1='\[\e[1m\]\w\$\[\e[0m\] '
+    export PS1='\n\[\e[33;1m\]================================================================================ \D{%F %T}\[\e[39m\]\n\[\e[1m\]\w\$\[\e[0m\] '
 fi
 
 function snappy() {
