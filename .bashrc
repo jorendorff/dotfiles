@@ -28,6 +28,7 @@ export CVS_RSH=ssh
 
 export JS="$HOME/dev/gecko/js/src/od-obj/dist/bin/js"
 export DJS="$HOME/dev/gecko/js/src/d-obj/dist/bin/js"
+export RJS="$HOME/dev/gecko/js/src/r-obj/dist/bin/js"
 
 function bug() {
     open "http://bugzilla.mozilla.org/show_bug.cgi?id=$@"
