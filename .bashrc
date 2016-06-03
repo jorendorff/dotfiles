@@ -16,7 +16,6 @@ export PATH=/usr/local/bin:${PATH}
 for p in "${HOME}/prefix/bin" \
              "${HOME}/bin" \
              "${HOME}/dev/dotfiles/myscripts" \
-             "$HOME/dev/node_modules/docco/bin" \
              "$HOME/.cabal/bin"; do
     pr=$(echo "$p" | /usr/bin/sed 's/\//\\\//g')
     PATH=$(echo "$PATH" | /usr/bin/sed 's/\(^\|:\)'"$pr"':/\1/g')
