@@ -1,0 +1,6 @@
+.emacs.d/session.*
+.emacs.d/elpa
+.emacs.d/network-security.data
+myscripts/rhythmbox
+myscripts/cargo-readme
+myscripts/*.pyc
