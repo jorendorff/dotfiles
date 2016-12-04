@@ -17,6 +17,14 @@
 ;; Reduce the number of characters before company kicks in
 ;;(setq company-minimum-prefix-length 1)
 
+
+;; zoom-frm.el
+(require 'zoom-frm)
+(define-key ctl-x-map [(control ?+)] 'zoom-in/out)
+(define-key ctl-x-map [(control ?-)] 'zoom-in/out)
+(define-key ctl-x-map [(control ?=)] 'zoom-in/out)
+(define-key ctl-x-map [(control ?0)] 'zoom-in/out)
+
 ;; Set path to racer binary
 
 
@@ -33,19 +41,12 @@
 
 ;; blessed silence
 (setq ring-bell-function 'ignore)
+
 ;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
 (global-set-key [mouse-6] (function (lambda () (interactive) nil)))
 (global-set-key [mouse-7] (function (lambda () (interactive) nil)))
 
-;; this is busted in Emacs 24.3.1, but it mostly works. squelch the error.
-(require 'color-theme-solarized)
-(condition-case ex
-    (color-theme-solarized-light)
-  ('error nil)
-  nil)
-
 (require 'vc-hg)
-;;(require 'mercurial-queues)
 (require 'page-ext)
 
 ;; Structural editing ftw! Thanks Scot!
@@ -69,8 +70,33 @@
 
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
-(setq auto-mode-alist
-      (cons '("\\.md" . markdown-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
+
+
+
+;; commented out because broken
+;; (require 'polymode)
+;; (require 'poly-markdown)
+;;
+;; use this to customize pm-inner/markdown?
+;; (defcustom rustbook-pm-inner/markdown
+;;   (pm-hbtchunkmode-auto "markdown"
+;;                      :head-reg "^[ \t]*```\\(?:\\)[{ \t]*\\w.*$"
+;;                      :tail-reg "^[ \t]*```[ \t]*$"
+;;                      :retriever-regexp "```[ \t]*\\(?:{\\|lang=\\)?\\(\\(\\w\\|\\s_\\)*\\)"
+;;                      :font-lock-narrow t))
+;;
+;; (defcustom rustbook-pm-poly/markdown
+;;   (pm-polymode-multi-auto "markdown"
+;;                         :hostmode 'pm-host/markdown
+;;                         :auto-innermode 'rustbook-pm-inner/markdown
+;;                         :init-functions '(poly-markdown-remove-markdown-hooks))
+;;   "Markdown custom configuration for rustbook"
+;;   :group 'polymodes
+;;   :type 'object)
+;;
+;; (define-polymode rustbook-poly-markdown-mode rustbook-pm-poly/markdown)
+;; (add-to-list 'auto-mode-alist '("\\.md" . rustbook-poly-markdown-mode))
 
 ;; yay rust
 ;;(add-to-list 'load-path "~/dev/rust/src/etc/emacs/")
@@ -123,16 +149,6 @@
   (interactive "r")
   (indent-rigidly start end -4))
 (global-set-key [?\C-<] 'dedent-rigidly-4)
-
-(defun whip ()
-  (interactive "")
-  (select-frame (make-frame))
-  (set-background-color "papaya whip"))
-
-(defun blue ()
-  (interactive "")
-  (select-frame (make-frame))
-  (set-background-color "#e0ecf8"))
 
 ;; Wheeeee!
 (server-start)
@@ -267,6 +283,8 @@
 (defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
 
+(global-set-key (kbd "C-x g") 'magit-status)
+
 ;; Custom.
 
 (custom-set-variables
@@ -283,10 +301,21 @@
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
+ '(package-selected-packages
+   (quote
+    (magit markdown-mode markdown-mode+ zoom-frm racer paredit haskell-mode flycheck-rust erlang elixir-mode company-racer color-theme-solarized cider)))
  '(paren-match-face (quote paren-face-match-light))
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
- '(safe-local-variable-values (quote ((js-indent-level . 2) (js2-basic-offset . 4) (js2-strict-trailing-comma-warning) (js2-skip-preprocessor-directives . t) (js2-basic-offset . 2) (buffer-file-coding-system . utf-8-unix) (insert-tabs-mode))))
+ '(safe-local-variable-values
+   (quote
+    ((js-indent-level . 2)
+     (js2-basic-offset . 4)
+     (js2-strict-trailing-comma-warning)
+     (js2-skip-preprocessor-directives . t)
+     (js2-basic-offset . 2)
+     (buffer-file-coding-system . utf-8-unix)
+     (insert-tabs-mode))))
  '(vc-handled-backends nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -294,3 +323,20 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "#657b83" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 85 :width normal :foundry "unknown" :family "VL Gothic")))))
+
+(defun save-macro (name)
+  "save a macro. Take a name as argument
+     and save the last defined macro under
+     this name at the end of your .emacs"
+  (interactive "SName of the macro :")  ; ask for the name of the macro
+  (kmacro-name-last-macro name)         ; use this name for the macro
+  (find-file user-init-file)            ; open ~/.emacs or other user init file
+  (goto-char (point-max))               ; go to the end of the .emacs
+  (newline)                             ; insert a newline
+  (insert-kbd-macro name)               ; copy the macro
+  (newline)                             ; insert a newline
+  (switch-to-buffer nil))               ; return to the initial buffer
+
+(fset 'js-try-result-to-bool
+   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([tab 74 83 95 84 82 89 95 82 69 83 85 76 84 95 84 79 95 66 79 79 76 4 4 4 right 99 120 44 32 4 134217749 134217742 59 67108896 right 5 right left 23] 0 "%d")) arg)))
+
