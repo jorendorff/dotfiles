@@ -4,8 +4,8 @@
 set -eu
 
 cd ~/dev/rust-ignorance/playground
-rm -rf rusteval
-cargo new --bin rusteval --vcs none
-cd rusteval
-echo "fn main() { println!(\"{:?}\", $@); }" > src/main.rs
-cargo run | tail -n +3
+rm -rf rusteval rusteval.rs
+echo "#![allow(unused_variables, dead_code)] " > rusteval.rs
+echo "fn main() { let v = {$@}; println!(\"{:?}\", v); }" >> rusteval.rs
+rustc rusteval.rs
+./rusteval
