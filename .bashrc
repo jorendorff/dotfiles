@@ -22,6 +22,7 @@ for p in "${HOME}/prefix/bin" \
     export PATH="${PATH}:${p}"
 done
 
+test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
 
 # CVS settings
 export CVS_RSH=ssh
@@ -85,7 +86,7 @@ function mach() {
     `hg root`/mach "$@"
 }
 
-export WORDCOUNT_FILE=closures.md
+export WORDCOUNT_FILE=io.md
 export WORDCOUNT_REV=`cd ~/dev/rustbook/atlas && git rev-parse HEAD`
 function wordcount() {
     echo $((`cat $WORDCOUNT_FILE | wc -w` - `git show $WORDCOUNT_REV:$WORDCOUNT_FILE | wc -w`))
@@ -93,6 +94,7 @@ function wordcount() {
 
 . ~/.nvm/nvm.sh
 
+. ~/.cargo/env  # enable rustup
 alias rusti="(cd $HOME/dev/rusti && cargo run)"
 
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
@@ -111,3 +113,22 @@ export PATH="/usr/local/heroku/bin:$PATH"
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 alias usenode='export PATH="$PATH:$(pwd)/node_modules/.bin"'
+
+
+# The following is the output of `exenv init -`; see `~/.exenv/README.md`.
+export PATH="/home/jorendorff/.exenv/shims:${PATH}"
+source "/home/jorendorff/.exenv/libexec/../completions/exenv.bash"
+exenv rehash 2>/dev/null
+exenv() {
+  local command="$1"
+  if [ "$#" -gt 0 ]; then
+    shift
+  fi
+
+  case "$command" in
+  shell)
+    eval `exenv "sh-$command" "$@"`;;
+  *)
+    command exenv "$command" "$@";;
+  esac
+}
