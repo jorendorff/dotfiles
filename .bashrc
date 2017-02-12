@@ -13,6 +13,7 @@ export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
 export PATH=${PATH}:$HOME/.cabal/bin
 #export PATH=${PATH}:/usr/local/share/python  # virtualenv wants this, brew wants it gone
 
+
 # CVS setings
 export CVS_RSH=ssh
 
@@ -69,8 +70,6 @@ function mach() {
     `hg root`/mach "$@"
 }
 
-. ~/.nvm/nvm.sh
-
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
 alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"gdb \" \\$11 \" \" \\$2}"`'
 export CVS_RSH=ssh
@@ -84,6 +83,18 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/rustlib/x86_64-unknown-li
 export CCACHE_COMPRESS=""
 export PATH="/usr/local/heroku/bin:$PATH"
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
+# version managers!
+
+echo starting nvm
+. ~/.nvm/nvm.sh...
+
+echo starting rvm...
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+echo starting pyenv...
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+
+echo starting pyenv-virtualenv...
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi

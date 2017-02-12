@@ -20,8 +20,8 @@ FF_DIST = "../../obj-x86_64-apple-darwin15.2.0.index"
 isWin = platform.system() == "Microsoft"
 isMac = platform.system() == "Darwin"
 isLinux = platform.system() == "Linux"
-isGCC = not isWin
-haveValgrind = not isWin
+isClangOrGCC = not isWin
+haveValgrind = not isMac and not isWin
 
 if isMac:
     say = ["say"]
@@ -58,7 +58,7 @@ class Variant:
             for var in os.environ:
                 env[var] = os.environ[var]
         else:
-            for var in ['PATH']:
+            for var in ['HOME', 'PATH']:
                 if var in os.environ:
                     env[var] = os.environ[var]
             env['SHELL'] = '/bin/bash'
@@ -81,7 +81,7 @@ class Variant:
         if 'd' in id:
             assert 'A' not in id
             args += ['--disable-optimize']  # note that 'o' overrides this
-            if isGCC:
+            if isClangOrGCC:
                 args += ['--enable-debug=-g3']
             else:
                 args += ['--enable-debug']
@@ -91,7 +91,7 @@ class Variant:
             # Address sanitizer
             assert isLinux
             assert '32' not in id
-            args += ['--enable-address-sanitizer', '--enable-debug-symbols', '--disable-threadsafe', '--disable-debug', '--enable-optimize=-O2 -g', '--enable-gczeal', '--enable-valgrind']
+            args += ['--enable-address-sanitizer', '--enable-debug-symbols', '--disable-threadsafe', '--disable-debug', '--enable-optimize=-O2 -g', '--enable-gczeal']  # '--enable-valgrind'
             env['LDFLAGS'] = "-fsanitize=address"
         else:
             args += ['--enable-debug-symbols']
@@ -111,9 +111,9 @@ class Variant:
         dist = os.path.abspath(FF_DIST)
         nspr_include_dir = os.path.join(dist, "include", "nspr")
         nspr_lib_dir = os.path.join(dist, "lib")
-        args += ['--with-nspr-cflags=-I' + nspr_include_dir,
-                 '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
-        args += ['--enable-ctypes']
+        #args += ['--with-nspr-cflags=-I' + nspr_include_dir,
+        #         '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
+        #args += ['--enable-ctypes']
 
         if 'j' in id:
             args += ['--enable-jemalloc']
@@ -194,7 +194,11 @@ def showCommand(command, cwd=None, env=None, stdout=None):
 
 def runCommandVerbose(*args, **kwargs):
     discard_stdout = kwargs.pop("discard_stdout", False)
-    with_colout = os.environ.get('EMACS') != 't' and sys.stdout.isatty() and args[0][0] == "make"
+    with_colout = (
+        isLinux
+        and os.environ.get('EMACS') != 't'
+        and sys.stdout.isatty()
+        and args[0][0] == "make")
 
     print ">>> ",
     showCommand(*args, **kwargs)

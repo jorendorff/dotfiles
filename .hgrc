@@ -25,11 +25,11 @@ children =
 color = 
 histedit = 
 reviewboard = /Users/jorendorff/.mozbuild/version-control-tools/hgext/reviewboard/client.py
-bzexport = /Users/jorendorff/.mozbuild/version-control-tools/hgext/bzexport
-bzpost = /Users/jorendorff/.mozbuild/version-control-tools/hgext/bzpost
-firefoxtree = /Users/jorendorff/.mozbuild/version-control-tools/hgext/firefoxtree
-bundleclone = /Users/jorendorff/.mozbuild/version-control-tools/hgext/bundleclone
-push-to-try = /Users/jorendorff/.mozbuild/version-control-tools/hgext/push-to-try
+bzexport = ~/.mozbuild/version-control-tools/hgext/bzexport
+bzpost = ~/.mozbuild/version-control-tools/hgext/bzpost
+firefoxtree = ~/.mozbuild/version-control-tools/hgext/firefoxtree
+push-to-try = ~/.mozbuild/version-control-tools/hgext/push-to-try
+hgwatchman = /Users/jorendorff/.mozbuild/hgwatchman/hgwatchman
 
 [email]
 from = Jason Orendorff <jorendorff@mozilla.com>
@@ -42,10 +42,24 @@ password = tychob
 
 [alias]
 try = push -f -rtip ssh://hg.mozilla.org/try
+wip = log --graph --rev=wip --template=wip
 
 [hooks]
 post-try = hg phase --force --draft "mq()"
+
 [hostfingerprints]
 bugzilla.mozilla.org = 7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17
 bitbucket.org = 46:de:34:e7:9b:18:cd:7f:ae:fd:8b:e3:bc:f4:1a:5e:38:d7:ac:24
-hg.mozilla.org = af:27:b9:34:47:4e:e5:98:01:f6:83:2b:51:c9:aa:d8:df:fb:1a:27
+
+[experimental]
+clonebundles = true
+
+[revsetalias]
+wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
+
+[templates]
+wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+
+[bugzilla]
+username = jorendorff@mozilla.com
+apikey = pMViIFqf2jgmFSKrPD1yMMaTkV8T16wQJglSh7By

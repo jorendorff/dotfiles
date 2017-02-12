@@ -23,13 +23,11 @@
 (add-to-list 'load-path "~/dev/dotfiles/.emacs.d/my-site-lisp")
 (add-to-list 'load-path "~/dev/mozilla-elisp")
 
-(add-to-list 'load-path "~/dev/rust-mode/")
-(require 'rust-mode)
 (setq-default indent-tabs-mode nil)  ;; never insert tabs
 
 (tool-bar-mode 0)  ;; no nasty tool-bar!
 
-(visit-tags-table "~/dev/gecko/TAGS")
+;;(visit-tags-table "~/dev/gecko/TAGS")
 
 (require 'etags-select)
 (global-set-key "\M-?" 'etags-select-find-tag-at-point)
@@ -64,14 +62,14 @@
 (require 'page-ext)
 
 ;; Structural editing ftw! Thanks Scot!
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+;; (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 
 (push "/opt/local/share/emacs/site-lisp" load-path)
 (autoload 'gid "idutils" nil t)
@@ -297,6 +295,14 @@
 ;; (setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
 ;; (require 'erlang-start)
 
+(global-set-key (kbd "C-x g") 'magit-status)
+
+;; For package zoom-frm.
+(global-set-key (kbd "C-x C-+") 'zoom-in/out)
+(global-set-key (kbd "C-x C-=") 'zoom-in/out)
+(global-set-key (kbd "C-x C--") 'zoom-in/out)
+(global-set-key (kbd "C-x C-0") 'zoom-in/out)
+
 
 ;; Custom.
 
@@ -314,14 +320,25 @@
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
+ '(package-selected-packages
+   (quote
+    (zoom-frm rust-mode magit haskell-mode color-theme-solarized color-theme cl-lib)))
  '(paren-match-face (quote paren-face-match-light))
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
- '(safe-local-variable-values (quote ((js-indent-level . 2) (js2-basic-offset . 4) (js2-strict-trailing-comma-warning) (js2-skip-preprocessor-directives . t) (js2-basic-offset . 2) (buffer-file-coding-system . utf-8-unix) (insert-tabs-mode))))
+ '(safe-local-variable-values
+   (quote
+    ((js-indent-level . 2)
+     (js2-basic-offset . 4)
+     (js2-strict-trailing-comma-warning)
+     (js2-skip-preprocessor-directives . t)
+     (js2-basic-offset . 2)
+     (buffer-file-coding-system . utf-8-unix)
+     (insert-tabs-mode))))
  '(vc-handled-backends nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "#657b83" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 85 :width normal :foundry "unknown" :family "VL Gothic")))))
+ '(default ((t (:inherit nil :stipple nil :background "#fdf6e3" :foreground "#657b83" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :family "Inconsolata")))))
