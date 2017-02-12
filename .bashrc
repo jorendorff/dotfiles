@@ -145,4 +145,4 @@ then
         command exenv "$command" "$@";;
       esac
     }
-end
+fi
