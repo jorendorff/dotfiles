@@ -37,18 +37,25 @@ elif isLinux:
 else:
     say = None
 
+def mungepath(env, dir):
+    dirs = env['PATH'].split(':')
+    if dir in dirs:
+        dirs.remove(dir)
+    dirs.insert(0, dir)
+    env['PATH'] = ':'.join(dirs)
+
 class Variant:
     def __init__(self, id):
         self.id = id
         self.dry_run = False
         self.hasGcZeal = 'd' in id
 
-        if re.match(r'^o?[rdA]j?c?(?:32)?$', id) is None:
+        if re.match(r'^C?o?[rdA]j?c?(?:32)?$', id) is None:
             raise ValueError("Unrecognized variant " + id)
 
         args = ['--enable-readline']
         cflags = []
-        makeArgs = []
+        makeArgs = ["-j9"]
         env = {}
 
         if '32' in id and not (isMac or isLinux):
@@ -57,26 +64,38 @@ class Variant:
         if isWin:
             for var in os.environ:
                 env[var] = os.environ[var]
+            if 'C' in id:
+                raise ValueError("clang isn't supported on Windows")
         else:
             for var in ['HOME', 'PATH']:
                 if var in os.environ:
                     env[var] = os.environ[var]
             env['SHELL'] = '/bin/bash'
-
             if isMac:
                 env['CC'] = 'clang'
                 env['CXX'] = 'clang++'
+                if 'C' in id:
+                    raise ValueError("clang with static analysis isn't supported yet on Mac")
                 if '32' in id:
                     env['LD'] = 'ld'
                     env['CROSS_COMPILE'] = '1'
                     env['CC'] += ' -arch i386'
                     env['CXX'] += ' -arch i386'
+            if isLinux and 'C' in id:
+                env['CC'] = 'clang'
+                env['CXX'] = 'clang++'
+                #env['CC'] = '/usr/local/llvm/libexec/ccc-analyzer'
+                #env['CXX'] = '/usr/local/llvm/libexec/c++-analyzer'
+                args += ['--enable-clang-plugin', '--without-intl-api', '--without-jemalloc']
+                mungepath(env, '/usr/local/llvm/bin')
             if isLinux and '32' in id:
                 env['PKG_CONFIG_LIBDIR'] = '/usr/lib/pkgconfig'
                 env['CC'] = 'gcc -m32'
                 env['CXX'] = 'g++ -m32'
                 env['AR'] = 'ar'
                 args += ['--target=i686-pc-linux']
+
+        env['MOZCONFIG'] = ".mozconfig-empty"  # ARGH js/src/configure reads the toplevel mozconfig by default. what a load of nonsense
 
         if 'd' in id:
             assert 'A' not in id
@@ -111,9 +130,11 @@ class Variant:
         dist = os.path.abspath(FF_DIST)
         nspr_include_dir = os.path.join(dist, "include", "nspr")
         nspr_lib_dir = os.path.join(dist, "lib")
-        #args += ['--with-nspr-cflags=-I' + nspr_include_dir,
-        #         '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
-        #args += ['--enable-ctypes']
+
+        args += ['--with-system-nspr']
+        ##args += ['--with-nspr-cflags=-I' + nspr_include_dir,
+        ##         '--with-nspr-libs=-L' + nspr_lib_dir + ' -lplds4 -lplc4 -lnspr4 -lpthread -ldl']
+        args += ['--enable-ctypes']
 
         if 'j' in id:
             args += ['--enable-jemalloc']
@@ -128,27 +149,21 @@ class Variant:
         self.makeArgs = makeArgs
 
     def build(self, cmd):
-        objdir = self.id + "-obj"
+        objdir = os.path.abspath(self.id + "-obj")
+        print("building variant {} in {!r}".format(self.id, objdir))
 
         # configure
         cmd(["mkdir", "-p", objdir])
         config_ts = os.path.join(objdir, 'config.ts')
         if (not os.path.exists(config_ts)
-            or os.path.getmtime('configure') >= os.path.getmtime(config_ts)):
-            if not os.path.exists(config_ts):
-                print("###  %r not found" % config_ts)
-            elif os.path.getmtime('configure') >= os.path.getmtime(config_ts):
-                print("### configure: %r; config.ts: %r" % (os.path.getmtime('configure'),
-                                                            os.path.getmtime(config_ts)))
-            else:
-                print("### confused")
-
+            or os.path.getmtime('configure') >= os.path.getmtime(config_ts)
+            or os.path.getmtime('old-configure.in') >= os.path.getmtime(config_ts)):
             script(cmd, ["../configure"] + self.configureArgs, cwd=objdir,
                    env=self.configureEnv)
             cmd(['touch', config_ts])
 
         # build
-        cmd(["make", "-j9"] + self.makeArgs, cwd=objdir)
+        cmd(["make"] + self.makeArgs, cwd=objdir)
 
         # "local install"
         bindir = os.path.join(objdir, "dist", "bin")

@@ -1,24 +1,35 @@
-echo "RUNNING: .bashrc"
-
 # Source global definitions
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# Add custom builds directory, then MacPorts install directory; also ~/prefix/bin and ~/bin.
-# This causes the PATH to get longer and longer as we nest interactive shells, alas.
+# Strip RVM directories out of PATH so that the rvm script later on will reinstate them
+# (RVM needs to be before /usr/local/bin in the PATH, but /usr/local/bin needs to be
+# before most other stuff...)
+export PATH=$(echo $PATH | sed 's/\(^\|:\)\([^:]*\/.rvm\/[^:]*:\)*/\1/g')
+export PATH=$(echo $PATH | sed 's/\(^\|:\)[^:]*\/.rvm\/[^:]*$//g')
+
+# Add custom builds directory, odds and ends.
+# Remove them first so PATH doesn't get longer and longer as we nest interactive shells.
+PATH=$(echo $PATH|sed 's/\(^\|:\)usr\/local\/bin:/\1/g')
 export PATH=/usr/local/bin:${PATH}
-export PATH=${PATH}:${HOME}/prefix/bin:${HOME}/bin:${HOME}/dev/dotfiles/myscripts
-export PATH=${PATH}:$HOME/dev/node_modules/docco/bin
-export PATH=${PATH}:$HOME/.cabal/bin
-#export PATH=${PATH}:/usr/local/share/python  # virtualenv wants this, brew wants it gone
+for p in "${HOME}/prefix/bin" \
+             "${HOME}/bin" \
+             "${HOME}/dev/dotfiles/myscripts" \
+             "$HOME/.cabal/bin"; do
+    pr=$(echo "$p" | /usr/bin/sed 's/\//\\\//g')
+    PATH=$(echo "$PATH" | /usr/bin/sed 's/\(^\|:\)'"$pr"':/\1/g')
+    export PATH="${PATH}:${p}"
+done
 
+test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
 
-# CVS setings
+# CVS settings
 export CVS_RSH=ssh
 
 export JS="$HOME/dev/gecko/js/src/od-obj/dist/bin/js"
 export DJS="$HOME/dev/gecko/js/src/d-obj/dist/bin/js"
+export RJS="$HOME/dev/gecko/js/src/r-obj/dist/bin/js"
 
 function bug() {
     open "http://bugzilla.mozilla.org/show_bug.cgi?id=$@"
@@ -26,6 +37,10 @@ function bug() {
 
 function es6draft() {
     bash "$HOME/dev/es6draft/bin/es6draft" "$@"
+}
+
+function gg() {
+    git log --graph --all --decorate "$@"
 }
 
 function grep-c() {
@@ -49,9 +64,10 @@ function minefield-release() {
 if [ "$TERM" == dumb ]; then
     export PS1='\w\$ '
 else
-    # Show prompt in bold to make it easier to find the beginning/end of
+    # Long line of yellow equal signs, and prompt in bold.
+    # All this is just to make it easier to find the beginning/end of
     # long command output.
-    export PS1='\[\e[1m\]\w\$\[\e[0m\] '
+    export PS1='\n\[\e[33;1m\]================================================================================ \D{%F %T}\[\e[39m\]\n\[\e[1m\]\w\$\[\e[0m\] '
 fi
 
 function snappy() {
@@ -69,6 +85,16 @@ function repeat() {
 function mach() {
     `hg root`/mach "$@"
 }
+
+export WORDCOUNT_FILE=io.md
+export WORDCOUNT_REV=`cd ~/dev/rustbook/atlas && git rev-parse HEAD`
+function wordcount() {
+    echo $((`cat $WORDCOUNT_FILE | wc -w` - `git show $WORDCOUNT_REV:$WORDCOUNT_FILE | wc -w`))
+}
+
+
+. ~/.cargo/env  # enable rustup
+alias rusti="(cd $HOME/dev/rusti && cargo run)"
 
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
 alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"gdb \" \\$11 \" \" \\$2}"`'
@@ -98,3 +124,25 @@ if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
 echo starting pyenv-virtualenv...
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+
+if [ "x"`which exenv` != "x" ]
+then
+    echo starting exenv...
+    # The following is the output of `exenv init -`; see `~/.exenv/README.md`.
+    export PATH="/home/jorendorff/.exenv/shims:${PATH}"
+    source "/home/jorendorff/.exenv/libexec/../completions/exenv.bash"
+    exenv rehash 2>/dev/null
+    exenv() {
+      local command="$1"
+      if [ "$#" -gt 0 ]; then
+        shift
+      fi
+
+      case "$command" in
+      shell)
+        eval `exenv "sh-$command" "$@"`;;
+      *)
+        command exenv "$command" "$@";;
+      esac
+    }
+end

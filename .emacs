@@ -17,6 +17,14 @@
 ;; Reduce the number of characters before company kicks in
 ;;(setq company-minimum-prefix-length 1)
 
+
+;; zoom-frm.el
+(require 'zoom-frm)
+(define-key ctl-x-map [(control ?+)] 'zoom-in/out)
+(define-key ctl-x-map [(control ?-)] 'zoom-in/out)
+(define-key ctl-x-map [(control ?=)] 'zoom-in/out)
+(define-key ctl-x-map [(control ?0)] 'zoom-in/out)
+
 ;; Set path to racer binary
 
 
@@ -46,19 +54,12 @@
 
 ;; blessed silence
 (setq ring-bell-function 'ignore)
+
 ;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
 (global-set-key [mouse-6] (function (lambda () (interactive) nil)))
 (global-set-key [mouse-7] (function (lambda () (interactive) nil)))
 
-;; this is busted in Emacs 24.3.1, but it mostly works. squelch the error.
-(require 'color-theme-solarized)
-(condition-case ex
-    (color-theme-solarized-light)
-  ('error nil)
-  nil)
-
-;;(require 'vc-hg)
-;;(require 'mercurial-queues)
+(require 'vc-hg)
 (require 'page-ext)
 
 ;; Structural editing ftw! Thanks Scot!
@@ -82,8 +83,33 @@
 
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
-(setq auto-mode-alist
-      (cons '("\\.md" . markdown-mode) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
+
+
+
+;; commented out because broken
+;; (require 'polymode)
+;; (require 'poly-markdown)
+;;
+;; use this to customize pm-inner/markdown?
+;; (defcustom rustbook-pm-inner/markdown
+;;   (pm-hbtchunkmode-auto "markdown"
+;;                      :head-reg "^[ \t]*```\\(?:\\)[{ \t]*\\w.*$"
+;;                      :tail-reg "^[ \t]*```[ \t]*$"
+;;                      :retriever-regexp "```[ \t]*\\(?:{\\|lang=\\)?\\(\\(\\w\\|\\s_\\)*\\)"
+;;                      :font-lock-narrow t))
+;;
+;; (defcustom rustbook-pm-poly/markdown
+;;   (pm-polymode-multi-auto "markdown"
+;;                         :hostmode 'pm-host/markdown
+;;                         :auto-innermode 'rustbook-pm-inner/markdown
+;;                         :init-functions '(poly-markdown-remove-markdown-hooks))
+;;   "Markdown custom configuration for rustbook"
+;;   :group 'polymodes
+;;   :type 'object)
+;;
+;; (define-polymode rustbook-poly-markdown-mode rustbook-pm-poly/markdown)
+;; (add-to-list 'auto-mode-alist '("\\.md" . rustbook-poly-markdown-mode))
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -129,16 +155,6 @@
   (interactive "r")
   (indent-rigidly start end -4))
 (global-set-key [?\C-<] 'dedent-rigidly-4)
-
-(defun whip ()
-  (interactive "")
-  (select-frame (make-frame))
-  (set-background-color "papaya whip"))
-
-(defun blue ()
-  (interactive "")
-  (select-frame (make-frame))
-  (set-background-color "#e0ecf8"))
 
 ;; Wheeeee!
 (server-start)
@@ -272,7 +288,6 @@
 
 (defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
-
 
 ;; Create sfink's personal style.
 (defconst sfink-c-style
