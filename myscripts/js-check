@@ -22,7 +22,7 @@ fi
 JS="$BINDIR/js"
 
 if [ $# == 0 ]; then
-    "$BINDIR/jsapi-tests"
+    (cd "$SRCDIR" && "$BINDIR/jsapi-tests")
 fi
 
 cd "$SRCDIR/jit-test"
