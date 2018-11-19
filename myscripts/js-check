@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-set -u
 
 if [ -f ./dist/bin/js ]; then
     OBJDIR=`pwd`
@@ -13,6 +12,8 @@ else
     SRCDIR=`hg root`/js/src
     OBJDIR=$SRCDIR/od-obj
 fi
+
+. "$OBJDIR/_virtualenvs/init/bin/activate"
 
 BINDIR="$OBJDIR"
 if [ -d "$BINDIR/js" ]; then
