@@ -1,9 +1,7 @@
 syntax: glob
 TAGS
 ID
-{r,d,d32,mr,md}{,x}-objdir
-*-{r,d,mr,md}{,x}-objdir
-*.orig
+build_*.OBJ
 *~
 .gdb_history
 .nss.checkout

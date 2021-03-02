@@ -7,10 +7,21 @@
 	glog = log --graph --all --decorate
 [push]
 	default = simple
+[pull]
+	ff = only
+
 [diff]
         algorithm = patience
+        submodule = log
 
 [merge]
         conflictstyle = diff3
 [color]
 	ui = auto
+[cinnabar]
+	version-check = 1614644044
+	helper = /Users/jorendorff/.mozbuild/git-cinnabar/git-cinnabar-helper
+[github]
+	user = jorendorff
+[advice]
+	detachedHead = false

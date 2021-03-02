@@ -11,10 +11,10 @@ fi
 if [ -f ./dist/bin/js ]; then
     OBJDIR=`pwd`
 else
-    OBJDIR=$SRCDIR/obj-debug
+    OBJDIR=$(cd $SRCDIR/../../obj-test; echo $PWD)
 fi
 
-. "$OBJDIR/_virtualenvs/init/bin/activate"
+. "$OBJDIR/_virtualenvs/init_py3/bin/activate"
 
 BINDIR="$OBJDIR"
 if [ -d "$BINDIR/js" ]; then
@@ -26,10 +26,17 @@ if [ $# == 0 ]; then
     (cd "$SRCDIR" && "$BINDIR/jsapi-tests")
 fi
 
-cd "$SRCDIR/jit-test"
-echo "running jit-test"
-python jit_test.py -f --no-slow "$JS" $@ || echo "FAIL FAIL FAIL"
+JSTESTFLAGS=""
+#JSTESTFLAGS="--args --rust-frontend" # was: "--feature-args --enable-experimental-fields"
 
+# Run jit-tests.
+set -x
+cd "$SRCDIR/jit-test"
+python jit_test.py -f --no-slow $JSTESTFLAGS "$JS" "$@" || echo "FAIL FAIL FAIL"
+set +x
+
+# Run js/tests.
+set -x
 cd "$SRCDIR/tests"
-echo "running js-tests"
-python jstests.py -j8 "$JS" $@
+python jstests.py -j8 $JSTESTFLAGS "$JS" "$@"
+set +x

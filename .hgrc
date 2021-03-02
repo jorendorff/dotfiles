@@ -2,10 +2,13 @@
 username = Jason Orendorff <jorendorff@mozilla.com>
 merge = internal:merge
 ignore = ~/.hgignore
+interface = curses
+tweakdefaults = true
 
 [defaults]
 diff = -U 8 -p
 qdiff = -U 8
+next = --evolve
 
 [diff]
 git = 1
@@ -13,6 +16,7 @@ showfunc = 1
 unified = 8
 
 [extensions]
+purge = 
 rebase = 
 mq = 
 churn = 
@@ -22,14 +26,22 @@ patchbomb =
 graphlog = 
 hgk = 
 children = 
-color = 
 histedit = 
-reviewboard = /Users/jorendorff/.mozbuild/version-control-tools/hgext/reviewboard/client.py
-bzexport = ~/.mozbuild/version-control-tools/hgext/bzexport
-bzpost = ~/.mozbuild/version-control-tools/hgext/bzpost
 firefoxtree = ~/.mozbuild/version-control-tools/hgext/firefoxtree
 push-to-try = ~/.mozbuild/version-control-tools/hgext/push-to-try
-hgwatchman = /Users/jorendorff/.mozbuild/hgwatchman/hgwatchman
+fsmonitor = 
+blackbox = 
+evolve = /Users/jorendorff/.mozbuild/evolve/hgext3rd/evolve
+absorb = 
+#format-source = /Users/jorendorff/.mozbuild/version-control-tools/hgext/format-source
+clang-format = /Users/jorendorff/.mozbuild/version-control-tools/hgext/clang-format
+js-format = /Users/jorendorff/.mozbuild/version-control-tools/hgext/js-format
+shelve = 
+
+[format-source]
+clang-format = /Users/jorendorff/work/gecko/mach clang-format --assume-filename $HG_FILENAME -p
+clang-format:configpaths = .clang-format, .clang-format-ignore
+clang-format:fileext = .cpp, .c, .cc, .h
 
 [email]
 from = Jason Orendorff <jorendorff@mozilla.com>
@@ -41,25 +53,43 @@ username = jason.orendorff@gmail.com
 password = tychob
 
 [alias]
-try = push -f -rtip ssh://hg.mozilla.org/try
+pwd = log -p -v -r .
 wip = log --graph --rev=wip --template=wip
+nextall = !while $HG next --evolve; do :; done
+smart-annotate = annotate -w --skip ignored_changesets
 
 [hooks]
 post-try = hg phase --force --draft "mq()"
 
-[hostfingerprints]
-bugzilla.mozilla.org = 7c:7a:c4:6c:91:3b:6b:89:cf:f2:8c:13:b8:02:c4:25:bd:1e:25:17
-bitbucket.org = 46:de:34:e7:9b:18:cd:7f:ae:fd:8b:e3:bc:f4:1a:5e:38:d7:ac:24
-
 [experimental]
 clonebundles = true
+graphshorten = true
 
 [revsetalias]
-wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or unstable()^) and not closed()
+wip = (parents(not public()) or not public() or . or (head() and branch(default))) and (not obsolete() or orphan()^) and not closed() and not (fxheads() - date(-90))
+ignored_changesets = desc("ignore-this-changeset") or extdata(get_ignored_changesets)
 
 [templates]
-wip = '{label("log.branch", branches)} {label("changeset.{phase}", rev)}{label("changeset.{phase}", ":")}{label("changeset.{phase}", short(node))} {label("grep.user", author|user)}{label("log.tag", if(tags," {tags}"))}{label("log.tag", if(fxheads," {fxheads}"))} {label("log.bookmark", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset("."), "desc.here"),desc|firstline)}'
+wip = '{label("wip.branch", if(branches,"{branches} "))}{label(ifeq(graphnode,"x","wip.obsolete","wip.{phase}"),"{rev}:{node|short}")}{label("wip.user", " {author|user}")}{label("wip.tags", if(tags," {tags}"))}{label("wip.tags", if(fxheads," {fxheads}"))}{if(bookmarks," ")}{label("wip.bookmarks", if(bookmarks,bookmarks))}{label(ifcontains(rev, revset("parents()"), "wip.here"), " {desc|firstline}")}'
 
 [bugzilla]
 username = jorendorff@mozilla.com
-apikey = pMViIFqf2jgmFSKrPD1yMMaTkV8T16wQJglSh7By
+apikey = cLuPD8rpV3uN9TTZiANvhUtWepqkiChOheoBCO6I
+[pager]
+pager = LESS=FRSXQ less
+[hostsecurity]
+bitbucket.org:fingerprints = sha256:4e:65:3e:76:0f:81:59:85:5b:50:06:0c:c2:4d:3c:56:53:8b:83:3e:9b:fa:55:26:98:9a:ca:e2:25:03:92:47
+bugzilla.mozilla.org:fingerprints = sha256:95:BA:0F:F2:C4:28:75:9D:B5:DB:4A:50:5F:29:46:A3:A9:4E:1B:56:A5:AE:10:50:C3:DD:3A:AC:73:BF:4A:D9
+[color]
+wip.bookmarks = yellow underline
+wip.branch = yellow
+wip.draft = green
+wip.here = red
+wip.obsolete = none
+wip.public = blue
+wip.tags = yellow
+wip.user = magenta
+[extdata]
+get_ignored_changesets = shell:cat `hg root`/.hg-annotate-ignore-revs 2> /dev/null || true
+[rebase]
+experimental.inmemory = yes

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# letter-count FILE ... - Print a histogram of word length in a file
+
+grep -v '^#' "$@" |             # Remove markdown headings
+    tr -d "'" |                 # Make "isn't" a single word
+    tr -cs '[:alpha:]' "\n" |   # One word per line; drop punctuation
+    grep -v '^$' |              # Drop blank lines
+    awk '{print length($1)}' |  # Count letters in each word
+    sort -n |
+    uniq -c |
+    perl -ane 'printf "%2d: %8d\n", $F[1], $F[0]'  # formatting

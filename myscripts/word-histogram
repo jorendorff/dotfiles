@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# word-histogram FILE ... - Print a histogram of all the words in a text file
+
+grep -v '^#' "$@" |               # Remove markdown headings
+    tr -cs '[:alpha:]'\' "\n" |   # One word per line; drop punctuation
+    tr '[:upper:]' '[:lower:]' |  # Convert all to lowercase (even names)
+    perl -pne "s/^''?//; s/''?$//;" |  # Drop single quotes (not perfect)
+    grep -v '^$' |                # Drop blank lines
+    sort -n |
+    uniq -c |
+    sort -n

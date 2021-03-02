@@ -15,28 +15,23 @@ PATH=$(echo $PATH|sed 's/\(^\|:\)usr\/local\/bin:/\1/g')
 export PATH=/usr/local/bin:${PATH}
 for p in "${HOME}/prefix/bin" \
              "${HOME}/bin" \
-             "${HOME}/dev/dotfiles/myscripts" \
-             "$HOME/.cabal/bin"; do
+             "${HOME}/work/dotfiles/myscripts" \
+             "${HOME}/.mozbuild/git-cinnabar" \
+             "/usr/local/sbin" \
+             "/usr/local/share/dotnet" \
+             "$HOME/.cabal/bin" \
+             "$HOME/.elan/bin" \
+             "$HOME/work/phacility/arcanist/bin"; do
     pr=$(echo "$p" | /usr/bin/sed 's/\//\\\//g')
     PATH=$(echo "$PATH" | /usr/bin/sed 's/\(^\|:\)'"$pr"':/\1/g')
     export PATH="${PATH}:${p}"
 done
 
-test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
-
 # CVS settings
 export CVS_RSH=ssh
 
-export JS="$HOME/dev/gecko/js/src/od-obj/dist/bin/js"
-export DJS="$HOME/dev/gecko/js/src/d-obj/dist/bin/js"
-export RJS="$HOME/dev/gecko/js/src/r-obj/dist/bin/js"
-
 function bug() {
     open "http://bugzilla.mozilla.org/show_bug.cgi?id=$@"
-}
-
-function es6draft() {
-    bash "$HOME/dev/es6draft/bin/es6draft" "$@"
 }
 
 function gg() {
@@ -78,32 +73,46 @@ function repeat() {
     repeat_count=$1
     shift
     for ((i=0; $i<$repeat_count; i++)); do
-        "$@" || break
+        "$@" || return
     done
 }
 
 function mach() {
-    `hg root`/mach "$@"
+    $((hg root 2>/dev/null) || git rev-parse --show-toplevel)/mach "$@"
 }
+. $HOME/work/mozilla-central/python/mach/bash-completion.sh
 
 export WORDCOUNT_FILE=io.md
-export WORDCOUNT_REV=`cd ~/dev/rustbook/atlas && git rev-parse HEAD`
+export WORDCOUNT_REV=`cd ~/work/rustbook/atlas && git rev-parse HEAD`
 function wordcount() {
     echo $((`cat $WORDCOUNT_FILE | wc -w` - `git show $WORDCOUNT_REV:$WORDCOUNT_FILE | wc -w`))
 }
 
+function rfdgrep() {
+    (
+        cd ~/work/oxidecomputer/rfd/rfd &&
+            ls 0*/README.{md,adoc} | xargs grep "$@"
+    )
+}
+
 
 . ~/.cargo/env  # enable rustup
-alias rusti="(cd $HOME/dev/rusti && cargo run)"
+alias rusti="(cd $HOME/work/rusti && cargo run)"
 
 alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
 alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"gdb \" \\$11 \" \" \\$2}"`'
 export CVS_RSH=ssh
-##export JAVA_HOME=`/usr/libexec/java_home`
+export JAVA_HOME=`/usr/libexec/java_home`
 
-alias ffc='~/apps/firefox/firefox -no-remote -P cal'
-alias ffd='firefox -no-remote -P default'  # use shipping ff to avoid okta freeze
-alias ffr='~/apps/firefox/firefox -no-remote -P refuge'
+alias es6draft='$HOME/work/es6draft/bin/es6draft'
+
+alias dafny='$HOME/play/dafny-lang/dafny/Binaries/dafny'
+#alias dafny="mono $HOME/play/dafny/dafny-3.0.0pre1-prebuilt/dafny/Dafny.exe"
+
+# command-line utility hack: `ok &&` means "if the previous command
+# succeded..."  Handy for queueing up more work for the shell to do after the
+# current build or whatever.
+alias ok='(exit $?)'
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/rustlib/x86_64-unknown-linux-gnu/lib
 export CCACHE_COMPRESS=""
@@ -112,18 +121,12 @@ export PATH="/usr/local/heroku/bin:$PATH"
 
 # version managers!
 
-echo starting nvm
-. ~/.nvm/nvm.sh...
+echo starting nvm...
+. ~/.nvm/nvm.sh
 
 echo starting rvm...
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-
-echo starting pyenv...
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-
-echo starting pyenv-virtualenv...
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
 if [ "x"`which exenv` != "x" ]
 then
@@ -146,3 +149,24 @@ then
       esac
     }
 fi
+
+export MOZCONFIG=$HOME/work/mozconfigs/debug
+
+# smoosh-tools!
+export PATH="${PATH}:${HOME}/work/smoosh-tools/bin"
+
+# opam configuration
+source "$HOME/.opam/opam-init/init.sh"
+
+export SCHEME=~/play/cell-gc/target/release/lisp
+alias scheme='rlwrap $SCHEME'
+
+export DJS=~/work/mozilla-central/build_DBG.OBJ/dist/bin/js
+export TJS=~/work/mozilla-central/build_TEST.OBJ/dist/bin/js
+
+export EDITOR=vim
+export GIT_EDITOR=emacs -nw
+
+alias msbuild="mono $HOME/play/dafny/Microsoft.Build.Mono.Debug.14.1.0.0-prerelease/lib/MSBuild.exe"
+
+shopt -s histappend

@@ -1,0 +1,13 @@
+settings set target.load-cwd-lldbinit true
+
+# Ugh. lldb is just a basket case unless I install homebrew's copy of Python.
+# Which is unreasonable. I need that.
+script import os, sys
+
+# Import Mozilla settings and utilities (the awkward structure of these
+# commands is necessary to avoid double importing of the Mozilla .lldbinit):
+script fallbacktopsrcdir = "/Users/jorendorff/work/gecko"
+script istopsrcdir = os.path.exists("mozilla-config.h.in")
+script topsrcdir = os.getcwd() if istopsrcdir else fallbacktopsrcdir
+script ignored = istopsrcdir or lldb.debugger.HandleCommand("command source -s true " + os.path.join(topsrcdir, ".lldbinit"))
+

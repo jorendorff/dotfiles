@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -eu
+
+moz=$HOME/work/moz
+PATH=$moz/subr:$PATH
+cmd=$1
+shift
+
+if ! [ -x "$moz/bin/$cmd" ]; then
+    echo "No such moz subcommand: $cmd" >&2
+    exit 1
+fi
+
+exec $moz/bin/$cmd "$@"
