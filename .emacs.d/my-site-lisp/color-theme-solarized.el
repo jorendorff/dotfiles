@@ -1,1 +1,0 @@
-/Users/jorendorff/dev/solarized/emacs-colors-solarized/color-theme-solarized.el
