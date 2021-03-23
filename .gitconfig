@@ -19,7 +19,7 @@
 [color]
 	ui = auto
 [cinnabar]
-	version-check = 1614644044
+	version-check = 1615599711
 	helper = /Users/jorendorff/.mozbuild/git-cinnabar/git-cinnabar-helper
 [github]
 	user = jorendorff
