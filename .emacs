@@ -364,12 +364,12 @@
 (c-add-style "mozilla" mozilla-c-style)
 
 ;; Erlang goofs.
-
 ;; (setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
 ;; (setq erlang-root-dir "/usr/local/lib/erlang")
 ;; (setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
 ;; (require 'erlang-start)
 
+;; For package magit.
 (global-set-key (kbd "C-x g") 'magit-status)
 
 ;; For package zoom-frm.
@@ -389,7 +389,6 @@
 
 
 ;; For package multiple-cursors
-
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -414,12 +413,6 @@
   (isearch-repeat-backward))
 (global-set-key (kbd "s-G") 'jorendorff-isearch-again-backward)
 (define-key isearch-mode-map [(super ?G)] 'isearch-repeat-backward)
-
-
-;; What
-
-(load "~/play/kfogel/happy-birthday-ben/bmcs-long-tweet.el")
-
 
 
 ;; Change utterly ridiculous defaults for Home and End keys.
@@ -455,14 +448,6 @@
   (other-window 1)
   (switch-to-buffer lean-next-error-buffer-name)
   (other-window 1))
-
-(defun jorendorff-lean-init ()
-  "Ugh i hate this go away"
-  (interactive)
-  (define-key lean-mode-map (kbd "C-c C-g") 'jorendorff-lean-arrange-windows)
-  (jorendorff-lean-arrange-windows))
-
-;;(add-hook 'lean-mode-hook 'jorendorff-lean-init)
 
 (when (not (null (window-system)))
   (server-start)
