@@ -4,3 +4,4 @@
 myscripts/rhythmbox
 myscripts/cargo-readme
 myscripts/*.pyc
+*~
