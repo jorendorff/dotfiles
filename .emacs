@@ -47,17 +47,6 @@
 (define-key ctl-x-map [?!] 'window-swap-states)
 
 
-
-(defun grep-for-symbol-at-point ()
-  "Do a grep for the symbol currently under the cursor"
-  (interactive)
-  (let* ((cur-word (thing-at-point 'symbol))
-         (cmd (concat "grep -rnH " cur-word " .")))
-    (grep-apply-setting 'grep-command cmd)
-    (grep cmd)))
-
-
-
 ;; Set path to racer binary
 
 
@@ -181,35 +170,11 @@
   (save-some-buffers))
 (ad-activate 'grep)
 
-;; Steve Yegge's js2-mode
-;;(autoload 'js2-mode "js2" nil t)
-;;(add-to-list 'auto-mode-alist '("\\.[ej]sm?$" . js2-mode))
-
 ;; Cycle through grep hits with C-`.
 (global-set-key [?\C-`] 'next-error)
 (global-set-key [?\C-~] 'previous-error)
 (global-set-key "\M-gr" 'grep)
 (global-set-key "\M-q"  'fill-paragraph)
-
-(defun select-all ()
-  (interactive "")
-  (set-mark (point-min))
-  (goto-char (point-max)))
-(global-set-key [(super ?a)] 'select-all)
-
-(defun js-debug ()
-  (interactive "")
-  (gud-gdb "gdb --fullname --args /home/jorendorff/work/gecko/js/src/d-objdir/dist/bin/js -f /home/jorendorff/work/gecko/js/src/tmp.js"))
-
-;; (global-set-key [(super ?g)] 'gud-gdb)
-;; (global-set-key [(super shift ?g)] 'js-debug)
-;; (global-set-key [(super ?b)] 'gud-break)
-;; (global-set-key [(super ?s)] 'gud-step)
-;; (global-set-key [(super ?n)] 'gud-next)
-;; (global-set-key [(super ?f)] 'gud-finish)
-;; (global-set-key [(super ?c)] 'gud-cont)
-;; (global-set-key [(super ?r)] 'gud-run)
-;; todo: [(super ?k)] to kill debuggee
 
 ;; C-< and C->
 (defun indent-rigidly-4 (start end)
@@ -221,32 +186,6 @@
   (indent-rigidly start end -4))
 (global-set-key [?\C-<] 'dedent-rigidly-4)
 
-
-;; Compile with F7
-
-(defun string-ends-with-p (str prefix)
-  (let ((strlen (length str))
-	(prelen (length prefix)))
-    (and (>= strlen prelen)
-	 (string= (substring str (- strlen prelen) strlen)
-		  prefix))))
-
-(defun in-spidermonkey-dir-p ()
-  (let ((buf (current-buffer)))
-    (and buf
-	 (let ((file-name (buffer-file-name buf)))
-	   (and file-name
-		(string-ends-with-p (file-name-directory file-name)
-				    "/js/src/"))))))
-
-(defun set-compile-command ()
-    (if (in-spidermonkey-dir-p)
-	(setq compile-command "~/work/dotfiles/myscripts/js-build")))
-
-(add-hook 'change-major-mode-hook 'set-compile-command)
-
-(global-set-key [f7] 'compile)
-
 ;; Nicety for ViewSourceWith.
 (add-hook 'text-mode-hook
 	  (function
@@ -254,76 +193,17 @@
 	     (setq fill-column 72))))
 
 
-(defconst mozilla-tab-width 4)
-
-(defun javascript-code-hook ()
-  (setq indent-tabs-mode nil))
-
-(add-hook 'js-mode-hook (function javascript-code-hook))
-
-(defun mozilla-code-hook ()
-  ;; Install mozilla-c++ style if not already installed...
-  (progn (c-set-style "mozilla")
-         (setq indent-tabs-mode nil)))
-
-(add-hook 'c-mode-common-hook (function mozilla-code-hook))
-
 ;; AAAAAAAAAARRRGH x-select-enable-clipboard t
 
-(defun unix ()
-  "Change the current buffer to use Unix line endings."
-  (interactive)
-  (set-buffer-file-coding-system 'unix))
 
 
 (defconst home-directory (getenv "HOME"))
 (defconst work-directory (concat home-directory "/work"))
 
-(defun review ()
-  (interactive)
-  ;; Copy current buffer to new buffer $DEV/reviews/review-$FILENAME.txt
-  (let* ((patch (buffer-string))
-         (original-basename (car (last (split-string (buffer-file-name) "/"))))
-         (file (concat work-directory "/reviews/review-" original-basename ".txt")))
-    (find-file file)
-    (if (file-exists-p file) (error "Review file already exists"))
-    (insert patch))
-
-  ;; Now hack up the patch.
-  (let ((first-line (point-min))
-        (last-line (save-excursion (goto-char (point-max)) (forward-line 0) (point))))
-    (string-rectangle first-line last-line "    >"))
-  (replace-regexp "^    >diff" "\n    >diff" nil (point-min) (point-max))
-  (replace-regexp "^    >@@" "\n    >@@" nil (point-min) (point-max))
-  (save-buffer)
-  (goto-char (point-min)))
-
-(defun review-prune ()
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    ;; merge "-x\n+x\n" to " x\n", repeatedly
-    ;; "now you have two problems" :-|
-    (while (re-search-forward "\\(^    >[^-].*\n\\)    >-\\(.*\\)\n\\(\\(    >-.*\n\\)*\\)    >\\+\\2\n" nil t)
-      (let ((p (match-beginning 0)))
-	(replace-match "\\1    > \\2\n\\3" nil nil)
-	(goto-char p)
-	(forward-line -1)))
-
-    ;; remove changeless hunks
-    (goto-char (point-min))
-    (while (search-forward-regexp "^\n    >@.*\n\\(    > .*\n\\)+\n" nil t)
-      (replace-match "\n")
-      (forward-line -2))))
-
-(define-key global-map "\C-c\C-a" 'review-prune)
-
 (defun jimb-diff-mode-hook ()
   (define-key diff-mode-map "\M-q" nil))
 (add-hook 'diff-mode-hook 'jimb-diff-mode-hook)
 
-(setq org-default-notes-file (concat work-directory "/notes.org"))
-(define-key global-map "\C-cc" 'org-capture)
 
 
 ;; HTML entities (key bindings chosen to match MacOS defaults)
@@ -348,18 +228,6 @@
 (defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
 
-(defconst mozilla-c-style
-  '((c-basic-offset             . 2)
-    (c-offsets-alist            . ((substatement-open . 0)
-                                   (case-label        . *)
-                                   (statement-case-intro . *)
-                                   (member-init-intro . *)
-                                   (innamespace       . 0)
-                                   (inline-open       . 0)
-                                   (func-decl-cont    . 0)))
-    (c-echo-syntactic-information-p . t))
-  "Mozilla C++ Programming Style")
-(c-add-style "mozilla" mozilla-c-style)
 
 ;; Erlang goofs.
 ;; (setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
