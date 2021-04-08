@@ -2,11 +2,7 @@
 (add-to-list 'package-archives
              '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives
-             '("marmalade" . "https://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/"))
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+             '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 (column-number-mode t)
