@@ -9,8 +9,6 @@
              '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (package-initialize)
 
-(add-to-list 'load-path "~/play/boogie-friends/emacs/")
-
 (column-number-mode t)
 (show-paren-mode t)
 
@@ -199,20 +197,6 @@
   (goto-char (point-max)))
 (global-set-key [(super ?a)] 'select-all)
 
-(defun js-debug ()
-  (interactive "")
-  (gud-gdb "gdb --fullname --args /home/jorendorff/work/gecko/js/src/d-objdir/dist/bin/js -f /home/jorendorff/work/gecko/js/src/tmp.js"))
-
-;; (global-set-key [(super ?g)] 'gud-gdb)
-;; (global-set-key [(super shift ?g)] 'js-debug)
-;; (global-set-key [(super ?b)] 'gud-break)
-;; (global-set-key [(super ?s)] 'gud-step)
-;; (global-set-key [(super ?n)] 'gud-next)
-;; (global-set-key [(super ?f)] 'gud-finish)
-;; (global-set-key [(super ?c)] 'gud-cont)
-;; (global-set-key [(super ?r)] 'gud-run)
-;; todo: [(super ?k)] to kill debuggee
-
 ;; C-< and C->
 (defun indent-rigidly-4 (start end)
   (interactive "r")
@@ -233,42 +217,7 @@
 	 (string= (substring str (- strlen prelen) strlen)
 		  prefix))))
 
-(defun in-spidermonkey-dir-p ()
-  (let ((buf (current-buffer)))
-    (and buf
-	 (let ((file-name (buffer-file-name buf)))
-	   (and file-name
-		(string-ends-with-p (file-name-directory file-name)
-				    "/js/src/"))))))
-
-(defun set-compile-command ()
-    (if (in-spidermonkey-dir-p)
-	(setq compile-command "~/work/dotfiles/myscripts/js-build")))
-
-(add-hook 'change-major-mode-hook 'set-compile-command)
-
 (global-set-key [f7] 'compile)
-
-;; Nicety for ViewSourceWith.
-(add-hook 'text-mode-hook
-	  (function
-	   (lambda ()
-	     (setq fill-column 72))))
-
-
-(defconst mozilla-tab-width 4)
-
-(defun javascript-code-hook ()
-  (setq indent-tabs-mode nil))
-
-(add-hook 'js-mode-hook (function javascript-code-hook))
-
-(defun mozilla-code-hook ()
-  ;; Install mozilla-c++ style if not already installed...
-  (progn (c-set-style "mozilla")
-         (setq indent-tabs-mode nil)))
-
-(add-hook 'c-mode-common-hook (function mozilla-code-hook))
 
 ;; AAAAAAAAAARRRGH x-select-enable-clipboard t
 
@@ -278,54 +227,9 @@
   (set-buffer-file-coding-system 'unix))
 
 
-(defconst home-directory (getenv "HOME"))
-(defconst work-directory (concat home-directory "/work"))
-
-(defun review ()
-  (interactive)
-  ;; Copy current buffer to new buffer $DEV/reviews/review-$FILENAME.txt
-  (let* ((patch (buffer-string))
-         (original-basename (car (last (split-string (buffer-file-name) "/"))))
-         (file (concat work-directory "/reviews/review-" original-basename ".txt")))
-    (find-file file)
-    (if (file-exists-p file) (error "Review file already exists"))
-    (insert patch))
-
-  ;; Now hack up the patch.
-  (let ((first-line (point-min))
-        (last-line (save-excursion (goto-char (point-max)) (forward-line 0) (point))))
-    (string-rectangle first-line last-line "    >"))
-  (replace-regexp "^    >diff" "\n    >diff" nil (point-min) (point-max))
-  (replace-regexp "^    >@@" "\n    >@@" nil (point-min) (point-max))
-  (save-buffer)
-  (goto-char (point-min)))
-
-(defun review-prune ()
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    ;; merge "-x\n+x\n" to " x\n", repeatedly
-    ;; "now you have two problems" :-|
-    (while (re-search-forward "\\(^    >[^-].*\n\\)    >-\\(.*\\)\n\\(\\(    >-.*\n\\)*\\)    >\\+\\2\n" nil t)
-      (let ((p (match-beginning 0)))
-	(replace-match "\\1    > \\2\n\\3" nil nil)
-	(goto-char p)
-	(forward-line -1)))
-
-    ;; remove changeless hunks
-    (goto-char (point-min))
-    (while (search-forward-regexp "^\n    >@.*\n\\(    > .*\n\\)+\n" nil t)
-      (replace-match "\n")
-      (forward-line -2))))
-
-(define-key global-map "\C-c\C-a" 'review-prune)
-
 (defun jimb-diff-mode-hook ()
   (define-key diff-mode-map "\M-q" nil))
 (add-hook 'diff-mode-hook 'jimb-diff-mode-hook)
-
-(setq org-default-notes-file (concat work-directory "/notes.org"))
-(define-key global-map "\C-cc" 'org-capture)
 
 
 ;; HTML entities (key bindings chosen to match MacOS defaults)
@@ -378,14 +282,6 @@
 (global-set-key (kbd "C-x C--") 'zoom-in/out)
 (global-set-key (kbd "C-x C-0") 'zoom-in/out)
 
-
-;; For package boogie-friends
-(require 'boogie-friends)
-(setq flycheck-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny")
-;;(setq flycheck-boogie-executable "PATH-TO-BOOGIE")  ;; can't figure out
-(setq flycheck-z3-smt2-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/z3/bin/z3")
-(setq flycheck-inferior-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny-server")
-;;(setq boogie-friends-profile-analyzer-executable "PATH-TO-Z3-AXIOM-PROFILER") ;; Optional
 
 
 ;; For package multiple-cursors
