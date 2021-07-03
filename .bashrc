@@ -103,9 +103,16 @@ export PATH="/usr/local/heroku/bin:$PATH"
 echo starting nvm...
 . ~/.nvm/nvm.sh
 
-echo starting rvm...
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+if [ -x "$HOME/.rvm" ]
+then
+    echo starting rvm...
+
+    # Add RVM to PATH for scripting
+    export PATH="$PATH:$HOME/.rvm/bin"
+
+    # Load RVM into a shell session *as a function*
+    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+fi
 
 if [ "x"`which exenv` != "x" ]
 then
@@ -129,12 +136,13 @@ then
     }
 fi
 
-export SCHEME=~/play/cell-gc/target/release/lisp
+export SCHEME=~/src/cell-gc/target/release/lisp
 alias scheme='rlwrap $SCHEME'
 
 export EDITOR=vim
-export GIT_EDITOR=emacs -nw
+export GIT_EDITOR='emacs -nw'
 
-alias msbuild="mono $HOME/play/dafny/Microsoft.Build.Mono.Debug.14.1.0.0-prerelease/lib/MSBuild.exe"
+alias msbuild="mono $HOME/src/dafny/Microsoft.Build.Mono.Debug.14.1.0.0-prerelease/lib/MSBuild.exe"
 
 shopt -s histappend
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -1,3 +1,7 @@
+;; .emacs - Emacs configuration
+
+;; Package repositories =======================================================
+
 (require 'package)
 (add-to-list 'package-archives
              '("gnu" . "https://elpa.gnu.org/packages/"))
@@ -7,10 +11,6 @@
              '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (package-initialize)
 
-(add-to-list 'load-path "~/play/boogie-friends/emacs/")
-
-(column-number-mode t)
-(show-paren-mode t)
 
 ;; Enable company globally for all modes
 ;;(global-company-mode)
@@ -23,16 +23,16 @@
 
 
 ;; zoom-frm.el
-(require 'zoom-frm)
-(define-key ctl-x-map [(control ?+)] 'zoom-in/out)
-(define-key ctl-x-map [(control ?-)] 'zoom-in/out)
-(define-key ctl-x-map [(control ?=)] 'zoom-in/out)
-(define-key ctl-x-map [(control ?0)] 'zoom-in/out)
-
-(define-key global-map [(super ?+)] 'zoom-in/out)
-(define-key global-map [(super ?=)] 'zoom-in/out)
-(define-key global-map [(super ?-)] 'zoom-in/out)
-(define-key global-map [(super ?0)] 'zoom-in/out)
+;; (require 'zoom-frm)
+;; (define-key ctl-x-map [(control ?+)] 'zoom-in/out)
+;; (define-key ctl-x-map [(control ?-)] 'zoom-in/out)
+;; (define-key ctl-x-map [(control ?=)] 'zoom-in/out)
+;; (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
+;;
+;; (define-key global-map [(super ?+)] 'zoom-in/out)
+;; (define-key global-map [(super ?=)] 'zoom-in/out)
+;; (define-key global-map [(super ?-)] 'zoom-in/out)
+;; (define-key global-map [(super ?0)] 'zoom-in/out)
 
 ;; hippie-expand! should try using M-/ for this
 ;;(define-key global-map [(meta ?\\)] 'hippie-expand)
@@ -116,7 +116,8 @@
 (add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
 
 
-
+;; For package xah-math-input =================================================
+(push "~/src/xah-math-input" load-path)
 (require 'xah-math-input)
 (puthash "<" "⟨" xah-math-input-abrvs)
 (puthash ">" "⟩" xah-math-input-abrvs)
@@ -139,8 +140,9 @@
 (define-key xah-math-input-keymap (kbd "S-SPC") nil)
 (define-key xah-math-input-keymap (kbd "M-S-SPC") 'xah-math-input-change-to-symbol)
 (global-xah-math-input-mode)
-;;(define-key global-map (kbd "M-S-SPC") 'xah-math-input-change-to-symbol)
 
+
+;; Poly-markdown ==============================================================
 ;; commented out because broken
 ;; (require 'polymode)
 ;; (require 'poly-markdown)
@@ -164,6 +166,15 @@
 ;;
 ;; (define-polymode rustbook-poly-markdown-mode rustbook-pm-poly/markdown)
 ;; (add-to-list 'auto-mode-alist '("\\.md" . rustbook-poly-markdown-mode))
+
+
+;; My custom tweaks ===========================================================
+
+;; Show column numbers in mode line.
+(column-number-mode t)
+
+;; When cursor is on a bracket, highlight the matching bracket.
+(show-paren-mode t)
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -205,8 +216,7 @@
 (add-hook 'diff-mode-hook 'jimb-diff-mode-hook)
 
 
-
-;; HTML entities (key bindings chosen to match MacOS defaults)
+;; HTML entities (key bindings chosen to match MacOS defaults) ================
 
 (defun insert-ldquo () (interactive) (insert "“"))
 (define-key global-map "\M-[" 'insert-ldquo)
@@ -229,32 +239,28 @@
 (define-key global-map "\M-_" 'insert-mdash)
 
 
-;; Erlang goofs.
-;; (setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
-;; (setq erlang-root-dir "/usr/local/lib/erlang")
-;; (setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
-;; (require 'erlang-start)
-
-;; For package magit.
+;; For package magit ==========================================================
 (global-set-key (kbd "C-x g") 'magit-status)
 
-;; For package zoom-frm.
-(global-set-key (kbd "C-x C-+") 'zoom-in/out)
-(global-set-key (kbd "C-x C-=") 'zoom-in/out)
-(global-set-key (kbd "C-x C--") 'zoom-in/out)
-(global-set-key (kbd "C-x C-0") 'zoom-in/out)
+
+;; For package zoom-frm =======================================================
+;; (global-set-key (kbd "C-x C-+") 'zoom-in/out)
+;; (global-set-key (kbd "C-x C-=") 'zoom-in/out)
+;; (global-set-key (kbd "C-x C--") 'zoom-in/out)
+;; (global-set-key (kbd "C-x C-0") 'zoom-in/out)
 
 
-;; For package boogie-friends
-(require 'boogie-friends)
-(setq flycheck-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny")
-;;(setq flycheck-boogie-executable "PATH-TO-BOOGIE")  ;; can't figure out
-(setq flycheck-z3-smt2-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/z3/bin/z3")
-(setq flycheck-inferior-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny-server")
-;;(setq boogie-friends-profile-analyzer-executable "PATH-TO-Z3-AXIOM-PROFILER") ;; Optional
+;; ;; For package boogie-friends =================================================
+;; (add-to-list 'load-path "~/repos/boogie-friends/emacs/")
+;; (require 'boogie-friends)
+;; (setq flycheck-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny")
+;; ;;(setq flycheck-boogie-executable "PATH-TO-BOOGIE")  ;; can't figure out
+;; (setq flycheck-z3-smt2-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/z3/bin/z3")
+;; (setq flycheck-inferior-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny-server")
+;; ;;(setq boogie-friends-profile-analyzer-executable "PATH-TO-Z3-AXIOM-PROFILER") ;; Optional
 
 
-;; For package multiple-cursors
+;; For package multiple-cursors ===============================================
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -262,7 +268,21 @@
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 
-;; For better isearch behavior.
+;; ============================================================================
+
+;; Change silly defaults for Home and End keys.
+(global-set-key [home] 'move-beginning-of-line)
+(global-set-key [end] 'move-end-of-line)
+
+;; Mac-like key bindings: Cmd+A to select all
+(defun select-all ()
+  (interactive "")
+  (set-mark (point-min))
+  (goto-char (point-max)))
+(global-set-key [(super ?a)] 'select-all)
+
+;; Mac-like key-bindings: Cmd+G to find again.
+;; Bind s-g and s-G to "search again", like C-s C-s and C-r C-r.
 (defun jorendorff-isearch-again-forward ()
   "Do the equivalent of C-s C-s."
   (interactive)
@@ -280,26 +300,30 @@
 (global-set-key (kbd "s-G") 'jorendorff-isearch-again-backward)
 (define-key isearch-mode-map [(super ?G)] 'isearch-repeat-backward)
 
-
-;; Change utterly ridiculous defaults for Home and End keys.
-(global-set-key [home] 'move-beginning-of-line)
-(global-set-key [end] 'move-end-of-line)
-
+;; Mac-like key-bindings: Cmd+W to close a buffer.
 (defun kill-current-buffer ()
   "Kill the current buffer without prompting which buffer to kill."
   (interactive)
   (kill-buffer))
-
 (global-set-key (kbd "s-w") 'kill-current-buffer)
+
+;; C-tab to switch buffers.
 (global-set-key (kbd "C-<tab>") 'next-buffer)
 (global-set-key (kbd "C-S-<tab>") 'previous-buffer)
+
+;; Special stuff to avoid when running in a terminal
+(when (not (null (window-system)))
+  (server-start)
+  (setq confirm-kill-emacs 'yes-or-no-p))
+
+
+;; Neat functions I will never use again ======================================
 
 (defun gen-password ()
   "Insert a randomly generated password into the buffer at point."
   (interactive)
   (insert (shell-command-to-string
            "python3 -c 'import secrets; print(secrets.token_urlsafe(12))'")))
-
 
 (defun jorendorff-lean-arrange-windows ()
   "Arrange windows for lean-mode."
@@ -315,18 +339,27 @@
   (switch-to-buffer lean-next-error-buffer-name)
   (other-window 1))
 
-(when (not (null (window-system)))
-  (server-start)
-  (setq confirm-kill-emacs 'yes-or-no-p))
+(defun unix ()
+  "Change the current buffer to use Unix line endings."
+  (interactive)
+  (set-buffer-file-coding-system 'unix))
+
+(defun grep-for-symbol-at-point ()
+  "Do a grep for the symbol currently under the cursor"
+  (interactive)
+  (let* ((cur-word (thing-at-point 'symbol))
+         (cmd (concat "grep -rnH " cur-word " .")))
+    (grep-apply-setting 'grep-command cmd)
+    (grep cmd)))
 
 
 ;; Custom.
 
 (custom-set-variables
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(c-comment-prefix-regexp "#\\|//+>?\\|\\**")
  '(create-lockfiles nil)
  '(fill-column 79)
@@ -341,7 +374,7 @@
  '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
  '(package-selected-packages
    (quote
-    (nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib)))
+    (htmlize nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib)))
  '(paren-match-face (quote paren-face-match-light))
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
@@ -350,3 +383,9 @@
     ((buffer-file-coding-system . utf-8-unix)
      (insert-tabs-mode))))
  '(vc-handled-backends nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
