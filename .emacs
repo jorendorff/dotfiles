@@ -1,18 +1,60 @@
+;; .emacs - finally got this just how i like it
+
+;; --- Package configuration
+
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)  ;; auto-install packages, YOLO
+
+(use-package flycheck)
+(use-package lsp-mode)
+(use-package lsp-ui)
+(use-package magit)
+(use-package multiple-cursors)
+(use-package markdown-mode)
+(use-package protobuf-mode)
+(use-package yaml-mode)
+
+(use-package xah-math-input
+  :bind (:map xah-math-input-keymap
+         ("M-S-SPC" . xah-math-input-change-to-symbol))
+
+  :config
+  (puthash "<" "⟨" xah-math-input-abrvs)
+  (puthash ">" "⟩" xah-math-input-abrvs)
+  (puthash "ring" "∘" xah-math-input-abrvs)
+  (puthash "compose" "∘" xah-math-input-abrvs)
+  (puthash "check" "✓" xah-math-input-abrvs)
+  (puthash "<|" "⊲" xah-math-input-abrvs)
+  (puthash "|>" "⊳" xah-math-input-abrvs)
+  (puthash "_|_" "⊥" xah-math-input-abrvs)
+
+  ;; pedantically insist on U+22C5 DOT OPERATOR rather than U+2022 BULLET
+  ;; or, like, U+2219 BULLET OPERATOR, etc. ad nauseam.
+  (xah-math-input--add-cycle ["*" "⋅" "•" "×"]) ; multiply, times
+
+  ;; I don't like the default key-binding.
+  (define-key xah-math-input-keymap (kbd "S-SPC") nil)
+  (global-xah-math-input-mode))
+
+(use-package rust-mode
+  :config
+  (add-hook 'rust-mode-hook #'lsp)
+  (add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
+                                           (lsp-format-buffer)))))
+
+
+;; --- Other junk
 
 (column-number-mode t)
 (show-paren-mode t)
 
 ;; Disable ns-popup-font-panel
 (global-unset-key (kbd "s-t"))
-
-;; Rust LSP integration.
-(add-hook 'rust-mode-hook #'lsp)
-(add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
-                                         (lsp-format-buffer))))
 
 ;; hippie-expand! should try using M-/ for this
 ;;(define-key global-map [(meta ?\\)] 'hippie-expand)
@@ -57,9 +99,6 @@
     result))
 (defalias 'plist-to-alist 'gcr/plist-to-alist)
 
-;; blessed silence
-(setq ring-bell-function 'ignore)
-
 ;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
 (global-set-key [mouse-6] (function (lambda () (interactive) nil)))
 (global-set-key [mouse-7] (function (lambda () (interactive) nil)))
@@ -85,30 +124,6 @@
   "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
 
-
-
-(require 'xah-math-input)
-(puthash "<" "⟨" xah-math-input-abrvs)
-(puthash ">" "⟩" xah-math-input-abrvs)
-(puthash "ring" "∘" xah-math-input-abrvs)
-(puthash "compose" "∘" xah-math-input-abrvs)
-(puthash "check" "✓" xah-math-input-abrvs)
-(puthash "<|" "⊲" xah-math-input-abrvs)
-(puthash "|>" "⊳" xah-math-input-abrvs)
-(puthash "_|_" "⊥" xah-math-input-abrvs)
-
-;; pedantically insist on U+22C5 DOT OPERATOR rather than U+2022 BULLET
-;; or, like, U+2219 BULLET OPERATOR, etc. ad nauseam.
-(xah-math-input--add-cycle ["*" "⋅" "•" "×"]) ; multiply, times
-
-;; lots of experimentation on whether to leave xah-math-input-mode enabled
-;; or just bind the key in global-map, or what
-;;(defun markdown-mode-use-xah-math-input ()
-;;  (xah-math-input-mode 1))
-;;(add-hook 'markdown-mode-hook 'markdown-mode-use-xah-math-input)
-(define-key xah-math-input-keymap (kbd "S-SPC") nil)
-(define-key xah-math-input-keymap (kbd "M-S-SPC") 'xah-math-input-change-to-symbol)
-(global-xah-math-input-mode)
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -348,10 +363,11 @@
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   '(play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib))
+   '(use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib))
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
+ '(ring-bell-function 'ignore)
  '(safe-local-variable-values
    '((eval c-set-offset 'arglist-cont-nonempty
            '(c-lineup-gcc-asm-reg c-lineup-arglist))
