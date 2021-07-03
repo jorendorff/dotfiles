@@ -27,9 +27,6 @@ for p in "${HOME}/prefix/bin" \
     export PATH="${PATH}:${p}"
 done
 
-# CVS settings
-export CVS_RSH=ssh
-
 function bug() {
     open "http://bugzilla.mozilla.org/show_bug.cgi?id=$@"
 }
@@ -77,17 +74,6 @@ function repeat() {
     done
 }
 
-function mach() {
-    $((hg root 2>/dev/null) || git rev-parse --show-toplevel)/mach "$@"
-}
-. $HOME/work/mozilla-central/python/mach/bash-completion.sh
-
-export WORDCOUNT_FILE=io.md
-export WORDCOUNT_REV=`cd ~/work/rustbook/atlas && git rev-parse HEAD`
-function wordcount() {
-    echo $((`cat $WORDCOUNT_FILE | wc -w` - `git show $WORDCOUNT_REV:$WORDCOUNT_FILE | wc -w`))
-}
-
 function rfdgrep() {
     (
         cd ~/work/oxidecomputer/rfd/rfd &&
@@ -95,14 +81,7 @@ function rfdgrep() {
     )
 }
 
-
 . ~/.cargo/env  # enable rustup
-alias rusti="(cd $HOME/work/rusti && cargo run)"
-
-alias copy-minefield-pid='ps auxww | grep '\''./firefox-bin -P'\'' | grep -v grep | awk '\''{pid = $2; count++} END { if (count == 1) { print "attach " pid; } else { print "ERROR"; } }'\'' | pbcopy'
-alias gdb-minefield='`ps auxww | grep Minefield | grep -v grep | awk "{print \"gdb \" \\$11 \" \" \\$2}"`'
-export CVS_RSH=ssh
-export JAVA_HOME=`/usr/libexec/java_home`
 
 alias es6draft='$HOME/work/es6draft/bin/es6draft'
 
@@ -124,9 +103,16 @@ export PATH="/usr/local/heroku/bin:$PATH"
 echo starting nvm...
 . ~/.nvm/nvm.sh
 
-echo starting rvm...
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+if [ -x "$HOME/.rvm" ]
+then
+    echo starting rvm...
+
+    # Add RVM to PATH for scripting
+    export PATH="$PATH:$HOME/.rvm/bin"
+
+    # Load RVM into a shell session *as a function*
+    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+fi
 
 if [ "x"`which exenv` != "x" ]
 then
@@ -150,23 +136,13 @@ then
     }
 fi
 
-export MOZCONFIG=$HOME/work/mozconfigs/debug
-
-# smoosh-tools!
-export PATH="${PATH}:${HOME}/work/smoosh-tools/bin"
-
-# opam configuration
-source "$HOME/.opam/opam-init/init.sh"
-
-export SCHEME=~/play/cell-gc/target/release/lisp
+export SCHEME=~/src/cell-gc/target/release/lisp
 alias scheme='rlwrap $SCHEME'
 
-export DJS=~/work/mozilla-central/build_DBG.OBJ/dist/bin/js
-export TJS=~/work/mozilla-central/build_TEST.OBJ/dist/bin/js
-
 export EDITOR=vim
-export GIT_EDITOR=emacs -nw
+export GIT_EDITOR='emacs -nw'
 
-alias msbuild="mono $HOME/play/dafny/Microsoft.Build.Mono.Debug.14.1.0.0-prerelease/lib/MSBuild.exe"
+alias msbuild="mono $HOME/src/dafny/Microsoft.Build.Mono.Debug.14.1.0.0-prerelease/lib/MSBuild.exe"
 
 shopt -s histappend
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -1,6 +1,6 @@
 ;; .emacs - finally got this just how i like it
 
-;; --- Package configuration
+;; Package configuration ======================================================
 
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -48,13 +48,22 @@
                                            (lsp-format-buffer)))))
 
 
-;; --- Other junk
+;; Other junk =================================================================
 
-(column-number-mode t)
-(show-paren-mode t)
+(add-to-list 'load-path "~/src/boogie-friends/emacs/")
 
-;; Disable ns-popup-font-panel
+
+;; Disable ns-popup-font-panel on Mac
 (global-unset-key (kbd "s-t"))
+
+;; Enable company globally for all modes
+;;(global-company-mode)
+;;
+;; Reduce the time after which the company autocomplete popup opens
+;;(setq company-idle-delay 0.2)
+;;
+;; Reduce the number of characters before company kicks in
+;;(setq company-minimum-prefix-length 1)
 
 ;; hippie-expand! should try using M-/ for this
 ;;(define-key global-map [(meta ?\\)] 'hippie-expand)
@@ -69,20 +78,6 @@
 
 (define-key global-map (kbd "C-x w") 'work-log)
 
-
-(defun grep-for-symbol-at-point ()
-  "Do a grep for the symbol currently under the cursor"
-  (interactive)
-  (let* ((cur-word (thing-at-point 'symbol))
-         (cmd (concat "grep -rnH " cur-word " .")))
-    (grep-apply-setting 'grep-command cmd)
-    (grep cmd)))
-
-
-;;(add-to-list 'load-path "~/work/dotfiles/.emacs.d/my-site-lisp")
-;;(add-to-list 'load-path "~/work/mozilla-elisp")
-
-(tool-bar-mode 0)  ;; no nasty tool-bar!
 
 ;;(visit-tags-table "~/work/gecko/TAGS")
 
@@ -125,26 +120,28 @@
 (add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
 
 
-;; Save before grepping, thanks to Jim Blandy.
-(defadvice grep (before save-before-grepping)
-  (save-some-buffers))
-(ad-activate 'grep)
+;; My custom tweaks ===========================================================
 
-;; Steve Yegge's js2-mode
-;;(autoload 'js2-mode "js2" nil t)
-;;(add-to-list 'auto-mode-alist '("\\.[ej]sm?$" . js2-mode))
+;; Show column numbers in mode line.
+(column-number-mode t)
+
+;; When cursor is on a bracket, highlight the matching bracket.
+(show-paren-mode t)
+
+;; No nasty tool-bar! good grief
+(tool-bar-mode 0)
+
+;; Save before grepping, thanks to Jim Blandy.
+(advice-add 'grep :before #'save-some-buffers)
+;; (defadvice grep (before save-before-grepping)
+;;   (save-some-buffers))
+;; (ad-activate 'grep)
 
 ;; Cycle through grep hits with C-`.
 (global-set-key [?\C-`] 'next-error)
 (global-set-key [?\C-~] 'previous-error)
 (global-set-key "\M-gr" 'grep)
 (global-set-key "\M-q"  'fill-paragraph)
-
-(defun select-all ()
-  (interactive "")
-  (set-mark (point-min))
-  (goto-char (point-max)))
-(global-set-key [(super ?a)] 'select-all)
 
 ;; C-< and C->
 (defun indent-rigidly-4 (start end)
@@ -157,30 +154,12 @@
 (global-set-key [?\C-<] 'dedent-rigidly-4)
 
 
-;; Compile with F7
-
-(defun string-ends-with-p (str prefix)
-  (let ((strlen (length str))
-	(prelen (length prefix)))
-    (and (>= strlen prelen)
-	 (string= (substring str (- strlen prelen) strlen)
-		  prefix))))
-
-(global-set-key [f7] 'compile)
-
-
-(defun unix ()
-  "Change the current buffer to use Unix line endings."
-  (interactive)
-  (set-buffer-file-coding-system 'unix))
-
-
 (defun jimb-diff-mode-hook ()
   (define-key diff-mode-map "\M-q" nil))
 (add-hook 'diff-mode-hook 'jimb-diff-mode-hook)
 
 
-;; HTML entities (key bindings chosen to match MacOS defaults)
+;; HTML entities (key bindings chosen to match MacOS defaults) ================
 
 (defun insert-ldquo () (interactive) (insert "“"))
 (define-key global-map "\M-[" 'insert-ldquo)
@@ -202,38 +181,50 @@
 (defun insert-mdash () (interactive) (insert "—"))
 (define-key global-map "\M-_" 'insert-mdash)
 
-(defconst mozilla-c-style
-  '((c-basic-offset             . 2)
-    (c-offsets-alist            . ((substatement-open . 0)
-                                   (case-label        . *)
-                                   (statement-case-intro . *)
-                                   (member-init-intro . *)
-                                   (innamespace       . 0)
-                                   (inline-open       . 0)
-                                   (func-decl-cont    . 0)))
-    (c-echo-syntactic-information-p . t))
-  "Mozilla C++ Programming Style")
-(c-add-style "mozilla" mozilla-c-style)
 
-;; Erlang goofs.
-;; (setq load-path (cons  "/usr/local/lib/erlang/lib/tools-2.6.8/emacs" load-path))
-;; (setq erlang-root-dir "/usr/local/lib/erlang")
-;; (setq exec-path (cons "/usr/local/lib/erlang/bin" exec-path))
-;; (require 'erlang-start)
-
-;; For package magit.
+;; For package magit ==========================================================
 (global-set-key (kbd "C-x g") 'magit-status)
 
 
-;; For package multiple-cursors
+;; For package zoom-frm =======================================================
+;; (global-set-key (kbd "C-x C-+") 'zoom-in/out)
+;; (global-set-key (kbd "C-x C-=") 'zoom-in/out)
+;; (global-set-key (kbd "C-x C--") 'zoom-in/out)
+;; (global-set-key (kbd "C-x C-0") 'zoom-in/out)
+;;
+;; (define-key ctl-x-map [(control ?+)] 'zoom-in/out)
+;; (define-key ctl-x-map [(control ?-)] 'zoom-in/out)
+;; (define-key ctl-x-map [(control ?=)] 'zoom-in/out)
+;; (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
+;; 
+;; (define-key global-map [(super ?+)] 'zoom-in/out)
+;; (define-key global-map [(super ?=)] 'zoom-in/out)
+;; (define-key global-map [(super ?-)] 'zoom-in/out)
+;; (define-key global-map [(super ?0)] 'zoom-in/out)
+
+
+;; ;; For package boogie-friends =================================================
+;; (add-to-list 'load-path "~/repos/boogie-friends/emacs/")
+;; (require 'boogie-friends)
+;; (setq flycheck-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny")
+;; ;;(setq flycheck-boogie-executable "PATH-TO-BOOGIE")  ;; can't figure out
+;; (setq flycheck-z3-smt2-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/z3/bin/z3")
+;; (setq flycheck-inferior-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny-server")
+;; ;;(setq boogie-friends-profile-analyzer-executable "PATH-TO-Z3-AXIOM-PROFILER") ;; Optional
+
+
+;; For package multiple-cursors ===============================================
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
+;; I don't know what this is ==================================================
 (require 'seq)
 
+;; Extremely complicated hack attempting to make lsp-diagnostis useful ========
+;; why does everything have to be garbage, i don't know
 (defun jorendorff-goto-first-error ()
     (interactive)
   (let* ((file-diagnostics-list-list-pairs (ht-items (lsp-diagnostics)))
@@ -269,7 +260,21 @@
 (global-set-key (kbd "C-x C-`") 'jorendorff-goto-first-error)
 
 
-;; For better isearch behavior.
+;; ============================================================================
+
+;; Change silly defaults for Home and End keys on Mac
+(global-set-key [home] 'move-beginning-of-line)
+(global-set-key [end] 'move-end-of-line)
+
+;; Mac-like key bindings: Cmd+A to select all
+(defun select-all ()
+  (interactive "")
+  (set-mark (point-min))
+  (goto-char (point-max)))
+(global-set-key [(super ?a)] 'select-all)
+
+;; Mac-like key-bindings: Cmd+G to find again.
+;; Bind s-g and s-G to "search again", like C-s C-s and C-r C-r.
 (defun jorendorff-isearch-again-forward ()
   "Do the equivalent of C-s C-s."
   (interactive)
@@ -287,26 +292,30 @@
 (global-set-key (kbd "s-G") 'jorendorff-isearch-again-backward)
 (define-key isearch-mode-map [(super ?G)] 'isearch-repeat-backward)
 
-
-;; Change utterly ridiculous defaults for Home and End keys.
-(global-set-key [home] 'move-beginning-of-line)
-(global-set-key [end] 'move-end-of-line)
-
+;; Mac-like key-bindings: Cmd+W to close a buffer.
 (defun kill-current-buffer ()
   "Kill the current buffer without prompting which buffer to kill."
   (interactive)
   (kill-buffer))
-
 (global-set-key (kbd "s-w") 'kill-current-buffer)
+
+;; C-tab to switch buffers.
 (global-set-key (kbd "C-<tab>") 'next-buffer)
 (global-set-key (kbd "C-S-<tab>") 'previous-buffer)
+
+;; Special stuff to avoid when running in a terminal
+(when (not (null (window-system)))
+  (server-start)
+  (setq confirm-kill-emacs 'yes-or-no-p))
+
+
+;; Neat functions I will never use again ======================================
 
 (defun gen-password ()
   "Insert a randomly generated password into the buffer at point."
   (interactive)
   (insert (shell-command-to-string
            "python3 -c 'import secrets; print(secrets.token_urlsafe(12))'")))
-
 
 (defun jorendorff-lean-arrange-windows ()
   "Arrange windows for lean-mode."
@@ -322,9 +331,18 @@
   (switch-to-buffer lean-next-error-buffer-name)
   (other-window 1))
 
-(when (not (null (window-system)))
-  (server-start)
-  (setq confirm-kill-emacs 'yes-or-no-p))
+(defun unix ()
+  "Change the current buffer to use Unix line endings."
+  (interactive)
+  (set-buffer-file-coding-system 'unix))
+
+(defun grep-for-symbol-at-point ()
+  "Do a grep for the symbol currently under the cursor"
+  (interactive)
+  (let* ((cur-word (thing-at-point 'symbol))
+         (cmd (concat "grep -rnH " cur-word " .")))
+    (grep-apply-setting 'grep-command cmd)
+    (grep cmd)))
 
 
 ;; Custom.
