@@ -1,47 +1,31 @@
 (require 'package)
-(add-to-list 'package-archives
-             '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
 (column-number-mode t)
 (show-paren-mode t)
 
-;; Enable company globally for all modes
-;;(global-company-mode)
-;;
-;; Reduce the time after which the company autocomplete popup opens
-;;(setq company-idle-delay 0.2)
-;;
-;; Reduce the number of characters before company kicks in
-;;(setq company-minimum-prefix-length 1)
+;; Disable ns-popup-font-panel
+(global-unset-key (kbd "s-t"))
 
-
-;; zoom-frm.el
-(require 'zoom-frm)
-(define-key ctl-x-map [(control ?+)] 'zoom-in/out)
-(define-key ctl-x-map [(control ?-)] 'zoom-in/out)
-(define-key ctl-x-map [(control ?=)] 'zoom-in/out)
-(define-key ctl-x-map [(control ?0)] 'zoom-in/out)
-
-(define-key global-map [(super ?+)] 'zoom-in/out)
-(define-key global-map [(super ?=)] 'zoom-in/out)
-(define-key global-map [(super ?-)] 'zoom-in/out)
-(define-key global-map [(super ?0)] 'zoom-in/out)
+;; Rust LSP integration.
+(add-hook 'rust-mode-hook #'lsp)
+(add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
+                                         (lsp-format-buffer))))
 
 ;; hippie-expand! should try using M-/ for this
 ;;(define-key global-map [(meta ?\\)] 'hippie-expand)
 
-;; Command to delete the current file from hg.
-(defun delete-current-file ()
- (interactive "")
- (shell-command (concat "hg rm " (buffer-name))))  ;; danger!
-
-;; (define-key ctl-x-map [(control ?d)] 'delete-current-file)
-
 (define-key ctl-x-map [?!] 'window-swap-states)
 
+
+(defun work-log ()
+  "Open my work log."
+  (interactive)
+  (find-file (concat (getenv "HOME") "/misc/work-log.md")))
+
+(define-key global-map (kbd "C-x w") 'work-log)
 
 
 (defun grep-for-symbol-at-point ()
@@ -51,10 +35,6 @@
          (cmd (concat "grep -rnH " cur-word " .")))
     (grep-apply-setting 'grep-command cmd)
     (grep cmd)))
-
-
-
-;; Set path to racer binary
 
 
 ;;(add-to-list 'load-path "~/work/dotfiles/.emacs.d/my-site-lisp")
@@ -89,19 +69,8 @@
 (define-key global-map [(control ?z)] nil)
 (define-key ctl-x-map [(control ?z)] nil)
 
-
-(require 'vc-hg)
 (require 'page-ext)
 
-;; Structural editing ftw! Thanks Scot!
-;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-;; (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 (add-hook 'dafny-mode-hook #'(lambda ()
                                (company-mode 0)
                                (auto-composition-mode 0)
@@ -111,12 +80,6 @@
 
 (push "/opt/local/share/emacs/site-lisp" load-path)
 (autoload 'gid "idutils" nil t)
-
-;; orgmode.org told me to put these lines in
-;; (require 'org-install)
-;; (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-;; (define-key global-map "\C-cl" 'org-store-link)
-;; (define-key global-map "\C-ca" 'org-agenda)
 
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
@@ -146,31 +109,6 @@
 (define-key xah-math-input-keymap (kbd "S-SPC") nil)
 (define-key xah-math-input-keymap (kbd "M-S-SPC") 'xah-math-input-change-to-symbol)
 (global-xah-math-input-mode)
-;;(define-key global-map (kbd "M-S-SPC") 'xah-math-input-change-to-symbol)
-
-;; commented out because broken
-;; (require 'polymode)
-;; (require 'poly-markdown)
-;;
-;; use this to customize pm-inner/markdown?
-;; (defcustom rustbook-pm-inner/markdown
-;;   (pm-hbtchunkmode-auto "markdown"
-;;                      :head-reg "^[ \t]*```\\(?:\\)[{ \t]*\\w.*$"
-;;                      :tail-reg "^[ \t]*```[ \t]*$"
-;;                      :retriever-regexp "```[ \t]*\\(?:{\\|lang=\\)?\\(\\(\\w\\|\\s_\\)*\\)"
-;;                      :font-lock-narrow t))
-;;
-;; (defcustom rustbook-pm-poly/markdown
-;;   (pm-polymode-multi-auto "markdown"
-;;                         :hostmode 'pm-host/markdown
-;;                         :auto-innermode 'rustbook-pm-inner/markdown
-;;                         :init-functions '(poly-markdown-remove-markdown-hooks))
-;;   "Markdown custom configuration for rustbook"
-;;   :group 'polymodes
-;;   :type 'object)
-;;
-;; (define-polymode rustbook-poly-markdown-mode rustbook-pm-poly/markdown)
-;; (add-to-list 'auto-mode-alist '("\\.md" . rustbook-poly-markdown-mode))
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
@@ -215,7 +153,6 @@
 
 (global-set-key [f7] 'compile)
 
-;; AAAAAAAAAARRRGH x-select-enable-clipboard t
 
 (defun unix ()
   "Change the current buffer to use Unix line endings."
@@ -272,13 +209,6 @@
 ;; For package magit.
 (global-set-key (kbd "C-x g") 'magit-status)
 
-;; For package zoom-frm.
-(global-set-key (kbd "C-x C-+") 'zoom-in/out)
-(global-set-key (kbd "C-x C-=") 'zoom-in/out)
-(global-set-key (kbd "C-x C--") 'zoom-in/out)
-(global-set-key (kbd "C-x C-0") 'zoom-in/out)
-
-
 
 ;; For package multiple-cursors
 (require 'multiple-cursors)
@@ -286,6 +216,42 @@
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+(require 'seq)
+
+(defun jorendorff-goto-first-error ()
+    (interactive)
+  (let* ((file-diagnostics-list-list-pairs (ht-items (lsp-diagnostics)))
+         (file-diagnostics-list-pairs (seq-mapcat (function (lambda (pair)
+                                                          (let ((file (car pair))
+                                                                (diag-list-list (cdr pair)))
+                                                            (mapcar (function (lambda (message-list)
+                                                                                (cons file message-list)))
+                                                                    diag-list-list))))
+                                              file-diagnostics-list-list-pairs))
+         (file-diagnostic-pairs (seq-mapcat (function (lambda (pair)
+                                                    (let ((file (car pair))
+                                                          (diag-list (cdr pair)))
+                                                      (mapcar (function (lambda (diag)
+                                                                          (cons file diag)))
+                                                              diag-list))))
+                                            file-diagnostics-list-pairs))
+         (file-diag-pairs-sorted (seq-sort (function (lambda (a b) (<= (ht-get (cdr a) "severity")
+                                                                       (ht-get (cdr b) "severity"))))
+                                           file-diagnostic-pairs))
+         (first-file-diag-pair (car file-diag-pairs-sorted)))
+    (when first-file-diag-pair
+      (let* ((file (car first-file-diag-pair))
+             (diag (cdr first-file-diag-pair))
+             (range (ht-get diag "range"))
+             (start (ht-get range "start"))
+             (line (ht-get start "line"))
+             (col (ht-get start "character")))
+        (find-file file)
+        (goto-line line)
+        (forward-char col)))))
+
+(global-set-key (kbd "C-x C-`") 'jorendorff-goto-first-error)
 
 
 ;; For better isearch behavior.
@@ -349,30 +315,58 @@
 ;; Custom.
 
 (custom-set-variables
-;; custom-set-variables was added by Custom.
-;; If you edit it by hand, you could mess it up, so be careful.
-;; Your init file should contain only one such instance.
-;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(c-comment-prefix-regexp "#\\|//+>?\\|\\**")
  '(create-lockfiles nil)
  '(fill-column 79)
- '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
+ '(flycheck-checker-error-threshold 2000)
+ '(global-company-mode nil)
+ '(grep-command "git-grep-rs -nH ")
+ '(grep-use-null-device nil)
+ '(haskell-mode-hook '(turn-on-haskell-indentation))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
  '(lean-memory-limit 4096)
  '(lean-rootdir "/Users/jorendorff/.elan")
+ '(lsp-keymap-prefix "s-l")
+ '(lsp-rust-all-features t)
+ '(lsp-rust-analyzer-cargo-watch-command "clippy")
+ '(lsp-rust-analyzer-display-chaining-hints t)
+ '(lsp-rust-analyzer-display-parameter-hints t)
+ '(lsp-rust-analyzer-server-display-inlay-hints t)
+ '(lsp-rust-clippy-preference "on")
+ '(lsp-rust-features [])
+ '(lsp-rust-server 'rust-analyzer)
+ '(lsp-signature-render-documentation nil)
+ '(lsp-ui-doc-enable nil)
+ '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
+ '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   (quote
-    (nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib)))
- '(paren-match-face (quote paren-face-match-light))
+   '(play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib))
+ '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
  '(safe-local-variable-values
-   (quote
-    ((buffer-file-coding-system . utf-8-unix)
-     (insert-tabs-mode))))
+   '((eval c-set-offset 'arglist-cont-nonempty
+           '(c-lineup-gcc-asm-reg c-lineup-arglist))
+     (eval c-set-offset 'arglist-close 0)
+     (eval c-set-offset 'arglist-intro '++)
+     (eval c-set-offset 'case-label 0)
+     (eval c-set-offset 'statement-case-open 0)
+     (eval c-set-offset 'substatement-open 0)
+     (buffer-file-coding-system . utf-8-unix)
+     (insert-tabs-mode)))
+ '(sentence-end-double-space nil)
  '(vc-handled-backends nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(lsp-rust-analyzer-inlay-face ((t (:inherit nil :background "gray98" :foreground "gray68")))))
