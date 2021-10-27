@@ -368,7 +368,7 @@
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
  '(lean-memory-limit 4096)
- '(lean-rootdir "/Users/jorendorff/.elan")
+ '(lean-rootdir "~/.elan")
  '(lsp-keymap-prefix "s-l")
  '(lsp-rust-all-features t)
  '(lsp-rust-analyzer-cargo-watch-command "clippy")
