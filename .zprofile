@@ -8,10 +8,4 @@
 #
 # I don't know why setting PS1 here has no effect.  See `.zshrc`.
 
-# strip /usr/local/bin from PATH and add it at the front
-export PATH=$(echo "$PATH" | sed 's/^\/usr\/local\/bin://' | sed 's/:\/usr\/local\/bin:/:/')
-export PATH="/usr/local/bin:${PATH}"
-
-# This prepends ~/.cargo/bin to the PATH
-source "$HOME/.cargo/env"
 
