@@ -18,10 +18,15 @@
 (use-package markdown-mode)
 (use-package protobuf-mode)
 (use-package yaml-mode)
+(use-package lean-mode)
+(use-package company-lean)
+(use-package helm-lean)
+(use-package haskell-mode)
 
 (use-package xah-math-input
   :bind (:map xah-math-input-keymap
-         ("M-S-SPC" . xah-math-input-change-to-symbol))
+              ("C-x C-SPC" . xah-math-input-change-to-symbol)
+              ("M-S-SPC" . xah-math-input-change-to-symbol))
 
   :config
   (puthash "<" "⟨" xah-math-input-abrvs)
@@ -32,6 +37,10 @@
   (puthash "<|" "⊲" xah-math-input-abrvs)
   (puthash "|>" "⊳" xah-math-input-abrvs)
   (puthash "_|_" "⊥" xah-math-input-abrvs)
+  (puthash "<>" "◇" xah-math-input-abrvs)
+  (puthash "[]" "◻" xah-math-input-abrvs)
+  (puthash "~" "¬" xah-math-input-abrvs)
+  (puthash "|=" "⊨" xah-math-input-abrvs)
 
   ;; pedantically insist on U+22C5 DOT OPERATOR rather than U+2022 BULLET
   ;; or, like, U+2219 BULLET OPERATOR, etc. ad nauseam.
@@ -132,10 +141,9 @@
 (tool-bar-mode 0)
 
 ;; Save before grepping, thanks to Jim Blandy.
-(advice-add 'grep :before #'save-some-buffers)
-;; (defadvice grep (before save-before-grepping)
-;;   (save-some-buffers))
-;; (ad-activate 'grep)
+(defadvice grep (before save-before-grepping)
+  (save-some-buffers))
+(ad-activate 'grep)
 
 ;; Cycle through grep hits with C-`.
 (global-set-key [?\C-`] 'next-error)
@@ -196,7 +204,7 @@
 ;; (define-key ctl-x-map [(control ?-)] 'zoom-in/out)
 ;; (define-key ctl-x-map [(control ?=)] 'zoom-in/out)
 ;; (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
-;; 
+;;
 ;; (define-key global-map [(super ?+)] 'zoom-in/out)
 ;; (define-key global-map [(super ?=)] 'zoom-in/out)
 ;; (define-key global-map [(super ?-)] 'zoom-in/out)
@@ -301,7 +309,8 @@
 
 ;; C-tab to switch buffers.
 (global-set-key (kbd "C-<tab>") 'next-buffer)
-(global-set-key (kbd "C-S-<tab>") 'previous-buffer)
+(global-set-key (kbd "C-<iso-lefttab>") 'previous-buffer)  ;; linux :-|
+(global-set-key (kbd "C-S-<tab>") 'previous-buffer)  ;; mac :-\
 
 ;; Special stuff to avoid when running in a terminal
 (when (not (null (window-system)))
@@ -331,11 +340,6 @@
   (switch-to-buffer lean-next-error-buffer-name)
   (other-window 1))
 
-(defun unix ()
-  "Change the current buffer to use Unix line endings."
-  (interactive)
-  (set-buffer-file-coding-system 'unix))
-
 (defun grep-for-symbol-at-point ()
   "Do a grep for the symbol currently under the cursor"
   (interactive)
@@ -359,7 +363,7 @@
  '(global-company-mode nil)
  '(grep-command "git-grep-rs -nH ")
  '(grep-use-null-device nil)
- '(haskell-mode-hook '(turn-on-haskell-indentation))
+ '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
@@ -373,29 +377,43 @@
  '(lsp-rust-analyzer-server-display-inlay-hints t)
  '(lsp-rust-clippy-preference "on")
  '(lsp-rust-features [])
- '(lsp-rust-server 'rust-analyzer)
+ '(lsp-rust-server (quote rust-analyzer))
  '(lsp-signature-render-documentation nil)
  '(lsp-ui-doc-enable nil)
  '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
  '(package-selected-packages
-   '(use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib))
- '(paren-match-face 'paren-face-match-light)
+   (quote
+    (use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib)))
+ '(paren-match-face (quote paren-face-match-light))
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
- '(ring-bell-function 'ignore)
+ '(ring-bell-function (quote ignore))
  '(safe-local-variable-values
-   '((eval c-set-offset 'arglist-cont-nonempty
-           '(c-lineup-gcc-asm-reg c-lineup-arglist))
-     (eval c-set-offset 'arglist-close 0)
-     (eval c-set-offset 'arglist-intro '++)
-     (eval c-set-offset 'case-label 0)
-     (eval c-set-offset 'statement-case-open 0)
-     (eval c-set-offset 'substatement-open 0)
+   (quote
+    ((eval c-set-offset
+           (quote arglist-cont-nonempty)
+           (quote
+            (c-lineup-gcc-asm-reg c-lineup-arglist)))
+     (eval c-set-offset
+           (quote arglist-close)
+           0)
+     (eval c-set-offset
+           (quote arglist-intro)
+           (quote ++))
+     (eval c-set-offset
+           (quote case-label)
+           0)
+     (eval c-set-offset
+           (quote statement-case-open)
+           0)
+     (eval c-set-offset
+           (quote substatement-open)
+           0)
      (buffer-file-coding-system . utf-8-unix)
-     (insert-tabs-mode)))
+     (insert-tabs-mode))))
  '(sentence-end-double-space nil)
  '(vc-handled-backends nil))
 (custom-set-faces
@@ -403,4 +421,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(fixed-pitch ((t nil)))
  '(lsp-rust-analyzer-inlay-face ((t (:inherit nil :background "gray98" :foreground "gray68")))))
