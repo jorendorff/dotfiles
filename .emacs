@@ -320,12 +320,6 @@
 
 ;; Neat functions I will never use again ======================================
 
-(defun gen-password ()
-  "Insert a randomly generated password into the buffer at point."
-  (interactive)
-  (insert (shell-command-to-string
-           "python3 -c 'import secrets; print(secrets.token_urlsafe(12))'")))
-
 (defun jorendorff-lean-arrange-windows ()
   "Arrange windows for lean-mode."
   (interactive)
