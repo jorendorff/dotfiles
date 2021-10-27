@@ -146,3 +146,6 @@ alias msbuild="mono $HOME/src/dafny/Microsoft.Build.Mono.Debug.14.1.0.0-prerelea
 
 shopt -s histappend
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Created by `pipx` on 2021-09-18 12:36:14
+export PATH="$PATH:/home/jorendorff/.local/bin"
