@@ -15,13 +15,15 @@
 (use-package lsp-ui)
 (use-package magit)
 (use-package multiple-cursors)
+
+(use-package haskell-mode)
 (use-package markdown-mode)
 (use-package protobuf-mode)
+(use-package terraform-mode)
 (use-package yaml-mode)
+
 (use-package lean-mode)
 (use-package company-lean)
-(use-package helm-lean)
-(use-package haskell-mode)
 
 (use-package xah-math-input
   :bind (:map xah-math-input-keymap
@@ -55,6 +57,16 @@
   (add-hook 'rust-mode-hook #'lsp)
   (add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
                                            (lsp-format-buffer)))))
+
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(use-package go-mode
+  :config
+  (add-hook 'go-mode-hook #'lsp-deferred)
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks))
 
 
 ;; Other junk =================================================================
