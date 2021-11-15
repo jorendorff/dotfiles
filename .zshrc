@@ -44,6 +44,7 @@ function ggu() {
 # current build or whatever.
 alias ok='(exit $?)'
 
-# completions
+# completions. `-C` silences a warning; compinit doesn't like that
+# /usr/local/share is group-writable.
 fpath+=~/.zfunc
-autoload -U compinit; compinit
+autoload -U compinit; compinit -C
