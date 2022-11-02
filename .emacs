@@ -1,3 +1,4 @@
+;; -*- coding: utf-8; lexical-binding: t -*-
 ;; .emacs - finally got this just how i like it
 
 ;; Package configuration ======================================================
