@@ -32,6 +32,10 @@ function blackbird-server() {
          cargo run -p blackbird-server --release -- "$@")
 }
 
+function linux() {
+    docker run --name ubuntu-bash --rm -i -t ubuntu bash
+}
+
 alias bbctl=blackbirdctl
 alias bb=blackbird-client
 
