@@ -156,11 +156,14 @@
 (defadvice grep (before save-before-grepping)
   (save-some-buffers))
 (ad-activate 'grep)
+(defadvice grep-find (before save-before-grepping)
+  (save-some-buffers))
+(ad-activate 'grep-find)
 
 ;; Cycle through grep hits with C-`.
 (global-set-key [?\C-`] 'next-error)
 (global-set-key [?\C-~] 'previous-error)
-(global-set-key "\M-gr" 'grep)
+(global-set-key "\M-gr" 'grep-find)
 (global-set-key "\M-q"  'fill-paragraph)
 
 ;; C-< and C->
@@ -354,9 +357,11 @@
     (grep-apply-setting 'grep-command cmd)
     (grep cmd)))
 
+;; Use ripgrep.
+(require 'grep) ;; seems necessary for grep-apply-setting to exist during initialization (?)
+
 
 ;; Custom.
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -367,7 +372,7 @@
  '(fill-column 79)
  '(flycheck-checker-error-threshold 2000)
  '(global-company-mode nil)
- '(grep-command "git-grep-rs -nH ")
+ '(grep-find-command '("rg -n -H --no-heading -e '' " . 27))
  '(grep-use-null-device nil)
  '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
  '(indent-tabs-mode nil)
