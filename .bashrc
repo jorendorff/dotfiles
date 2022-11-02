@@ -3,8 +3,6 @@ if [[ -f /etc/bashrc ]]; then
     . /etc/bashrc
 fi
 
-echo "before doing anything, PATH=$PATH"
-
 # Strip RVM directories out of PATH so that the rvm script later on will reinstate them
 # (RVM needs to be before /usr/local/bin in the PATH, but /usr/local/bin needs to be
 # before most other stuff...)
