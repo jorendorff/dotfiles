@@ -52,3 +52,9 @@ alias ok='(exit $?)'
 # /usr/local/share is group-writable.
 fpath+=~/.zfunc
 autoload -U compinit; compinit -C
+
+# (GitHub work) Use goproxy.
+export GOPROXY=https://goproxy.githubapp.com/mod,https://proxy.golang.org/,direct
+export GOPRIVATE=
+export GONOPROXY=
+export GONOSUMDB='github.com/github/*'
