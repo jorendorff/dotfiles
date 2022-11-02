@@ -105,3 +105,9 @@ shopt -s histappend
 
 # Created by `pipx` on 2021-09-18 12:36:14
 export PATH="$PATH:/home/jorendorff/.local/bin"
+
+# (GitHub work) Use goproxy.
+export GOPROXY=https://goproxy.githubapp.com/mod,https://proxy.golang.org/,direct
+export GOPRIVATE=
+export GONOPROXY=
+export GONOSUMDB='github.com/github/*'
