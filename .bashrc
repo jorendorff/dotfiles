@@ -1,9 +1,7 @@
 # Source global definitions
-if [ -f /etc/bashrc ]; then
+if [[ -f /etc/bashrc ]]; then
     . /etc/bashrc
 fi
-
-echo "before doing anything, PATH=$PATH"
 
 # Strip RVM directories out of PATH so that the rvm script later on will reinstate them
 # (RVM needs to be before /usr/local/bin in the PATH, but /usr/local/bin needs to be
@@ -27,7 +25,7 @@ for p in "${HOME}/prefix/bin" \
     export PATH="${PATH}:${p}"
 done
 
-if [ "$TERM" == dumb ]; then
+if [[ "$TERM" == dumb ]]; then
     export PS1='\w\$ '
 else
     # Long line of yellow equal signs, and prompt in bold.
@@ -48,7 +46,9 @@ function repeat() {
     done
 }
 
-. ~/.cargo/env  # enable rustup
+if [[ -f ~/.cargo/env ]]; then
+    . ~/.cargo/env  # enable rustup
+fi
 
 # command-line utility hack: `ok &&` means "if the previous command
 # succeded..."  Handy for queueing up more work for the shell to do after the
@@ -101,7 +101,13 @@ export GIT_EDITOR='emacs -nw'
 
 shopt -s histappend
 
-[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[[ -f "$NVM_DIR/bash_completion" ]] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Created by `pipx` on 2021-09-18 12:36:14
 export PATH="$PATH:/home/jorendorff/.local/bin"
+
+# (GitHub work) Use goproxy.
+export GOPROXY=https://goproxy.githubapp.com/mod,https://proxy.golang.org/,direct
+export GOPRIVATE=
+export GONOPROXY=
+export GONOSUMDB='github.com/github/*'
