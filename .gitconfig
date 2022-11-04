@@ -25,6 +25,3 @@
 
 [core]
         excludesFile = ~/.gitignore
-
-[credential]
-	helper = osxkeychain
