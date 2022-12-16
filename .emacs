@@ -12,8 +12,7 @@
 (setq use-package-always-ensure t)  ;; auto-install packages, YOLO
 
 (use-package flycheck)
-(use-package lsp-mode)
-(use-package lsp-ui)
+(use-package eglot)
 (use-package magit)
 (use-package multiple-cursors)
 
@@ -53,21 +52,7 @@
   (define-key xah-math-input-keymap (kbd "S-SPC") nil)
   (global-xah-math-input-mode))
 
-(use-package rust-mode
-  :config
-  (add-hook 'rust-mode-hook #'lsp)
-  (add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
-                                           (lsp-format-buffer)))))
-
-;; Set up before-save hooks to format buffer and add/delete imports.
-;; Make sure you don't have other gofmt/goimports hooks enabled.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(use-package go-mode
-  :config
-  (add-hook 'go-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks))
+(use-package rust-mode)
 
 
 ;; Other junk =================================================================
@@ -247,42 +232,6 @@
 ;; I don't know what this is ==================================================
 (require 'seq)
 
-;; Extremely complicated hack attempting to make lsp-diagnostis useful ========
-;; why does everything have to be garbage, i don't know
-(defun jorendorff-goto-first-error ()
-    (interactive)
-  (let* ((file-diagnostics-list-list-pairs (ht-items (lsp-diagnostics)))
-         (file-diagnostics-list-pairs (seq-mapcat (function (lambda (pair)
-                                                          (let ((file (car pair))
-                                                                (diag-list-list (cdr pair)))
-                                                            (mapcar (function (lambda (message-list)
-                                                                                (cons file message-list)))
-                                                                    diag-list-list))))
-                                              file-diagnostics-list-list-pairs))
-         (file-diagnostic-pairs (seq-mapcat (function (lambda (pair)
-                                                    (let ((file (car pair))
-                                                          (diag-list (cdr pair)))
-                                                      (mapcar (function (lambda (diag)
-                                                                          (cons file diag)))
-                                                              diag-list))))
-                                            file-diagnostics-list-pairs))
-         (file-diag-pairs-sorted (seq-sort (function (lambda (a b) (<= (ht-get (cdr a) "severity")
-                                                                       (ht-get (cdr b) "severity"))))
-                                           file-diagnostic-pairs))
-         (first-file-diag-pair (car file-diag-pairs-sorted)))
-    (when first-file-diag-pair
-      (let* ((file (car first-file-diag-pair))
-             (diag (cdr first-file-diag-pair))
-             (range (ht-get diag "range"))
-             (start (ht-get range "start"))
-             (line (ht-get start "line"))
-             (col (ht-get start "character")))
-        (find-file file)
-        (goto-line line)
-        (forward-char col)))))
-
-(global-set-key (kbd "C-x C-`") 'jorendorff-goto-first-error)
-
 
 ;; ============================================================================
 
@@ -381,18 +330,6 @@
  '(js-indent-level 2)
  '(lean-memory-limit 4096)
  '(lean-rootdir "~/.elan")
- '(lsp-keymap-prefix "s-l")
- '(lsp-rust-all-features t)
- '(lsp-rust-analyzer-cargo-watch-command "clippy")
- '(lsp-rust-analyzer-display-chaining-hints t)
- '(lsp-rust-analyzer-display-parameter-hints t)
- '(lsp-rust-analyzer-server-display-inlay-hints t)
- '(lsp-rust-clippy-preference "on")
- '(lsp-rust-features [])
- '(lsp-rust-server (quote rust-analyzer))
- '(lsp-signature-render-documentation nil)
- '(lsp-ui-doc-enable nil)
- '(lsp-ui-sideline-show-hover t)
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
