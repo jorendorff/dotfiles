@@ -17,6 +17,7 @@
 (use-package multiple-cursors)
 
 (use-package haskell-mode)
+(use-package lua-mode)
 (use-package markdown-mode)
 (use-package protobuf-mode)
 (use-package terraform-mode)
