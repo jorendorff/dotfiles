@@ -324,7 +324,7 @@
  '(global-company-mode nil)
  '(grep-find-command '("rg -n -H --no-heading -e '' " . 27))
  '(grep-use-null-device nil)
- '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
+ '(haskell-mode-hook '(turn-on-haskell-indentation))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
@@ -333,37 +333,23 @@
  '(magit-list-refs-sortby '("-creatordate"))
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
+ '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   (quote
-    (use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends multiple-cursors idris-mode clojure-mode markdown-mode zoom-frm rust-mode magit haskell-mode cl-lib)))
- '(paren-match-face (quote paren-face-match-light))
+   '(magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
+ '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
- '(ring-bell-function (quote ignore))
+ '(ring-bell-function 'ignore)
  '(safe-local-variable-values
-   (quote
-    ((eval c-set-offset
-           (quote arglist-cont-nonempty)
-           (quote
-            (c-lineup-gcc-asm-reg c-lineup-arglist)))
-     (eval c-set-offset
-           (quote arglist-close)
-           0)
-     (eval c-set-offset
-           (quote arglist-intro)
-           (quote ++))
-     (eval c-set-offset
-           (quote case-label)
-           0)
-     (eval c-set-offset
-           (quote statement-case-open)
-           0)
-     (eval c-set-offset
-           (quote substatement-open)
-           0)
+   '((eval c-set-offset 'arglist-cont-nonempty
+           '(c-lineup-gcc-asm-reg c-lineup-arglist))
+     (eval c-set-offset 'arglist-close 0)
+     (eval c-set-offset 'arglist-intro '++)
+     (eval c-set-offset 'case-label 0)
+     (eval c-set-offset 'statement-case-open 0)
+     (eval c-set-offset 'substatement-open 0)
      (buffer-file-coding-system . utf-8-unix)
-     (insert-tabs-mode))))
+     (insert-tabs-mode)))
  '(sentence-end-double-space nil)
  '(vc-handled-backends nil))
 (custom-set-faces
