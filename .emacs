@@ -330,6 +330,7 @@
  '(js-indent-level 2)
  '(lean-memory-limit 4096)
  '(lean-rootdir "~/.elan")
+ '(magit-list-refs-sortby '("-creatordate"))
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1 ((shift) . 5) ((control)))))
