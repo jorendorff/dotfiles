@@ -20,7 +20,7 @@
 (use-package haskell-mode)
 (use-package markdown-mode)
 (use-package protobuf-mode)
-(use-package terraform-mode)
+;;(use-package terraform-mode)
 (use-package yaml-mode)
 
 (use-package lean-mode)
