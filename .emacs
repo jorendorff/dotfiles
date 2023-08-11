@@ -226,74 +226,6 @@
   (define-key diff-mode-map "\M-q" nil))
 (add-hook 'diff-mode-hook 'jimb-diff-mode-hook)
 
-
-;; HTML entities (key bindings chosen to match MacOS defaults) ================
-
-(defun insert-ldquo () (interactive) (insert "“"))
-(define-key global-map "\M-[" 'insert-ldquo)
-
-(defun insert-rdquo () (interactive) (insert "”"))
-(define-key global-map "\M-{" 'insert-rdquo)
-
-(defun markdown-mode-keymap-smackdown ()
-  (local-unset-key "\M-}")
-  (local-unset-key "\M-{"))
-(add-hook 'markdown-mode-hook 'markdown-mode-keymap-smackdown)
-
-(defun insert-lsquo () (interactive) (insert "‘"))
-(define-key global-map "\M-]" 'insert-lsquo)
-
-(defun insert-rsquo () (interactive) (insert "’"))
-(define-key global-map "\M-}" 'insert-rsquo)
-
-(defun insert-mdash () (interactive) (insert "—"))
-(define-key global-map "\M-_" 'insert-mdash)
-
-
-;; For package magit ==========================================================
-(global-set-key (kbd "C-x g") 'magit-status)
-
-
-;; For package zoom-frm =======================================================
-;; (global-set-key (kbd "C-x C-+") 'zoom-in/out)
-;; (global-set-key (kbd "C-x C-=") 'zoom-in/out)
-;; (global-set-key (kbd "C-x C--") 'zoom-in/out)
-;; (global-set-key (kbd "C-x C-0") 'zoom-in/out)
-;;
-;; (define-key ctl-x-map [(control ?+)] 'zoom-in/out)
-;; (define-key ctl-x-map [(control ?-)] 'zoom-in/out)
-;; (define-key ctl-x-map [(control ?=)] 'zoom-in/out)
-;; (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
-;;
-;; (define-key global-map [(super ?+)] 'zoom-in/out)
-;; (define-key global-map [(super ?=)] 'zoom-in/out)
-;; (define-key global-map [(super ?-)] 'zoom-in/out)
-;; (define-key global-map [(super ?0)] 'zoom-in/out)
-
-
-;; ;; For package boogie-friends =================================================
-;; (add-to-list 'load-path "~/repos/boogie-friends/emacs/")
-;; (require 'boogie-friends)
-;; (setq flycheck-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny")
-;; ;;(setq flycheck-boogie-executable "PATH-TO-BOOGIE")  ;; can't figure out
-;; (setq flycheck-z3-smt2-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/z3/bin/z3")
-;; (setq flycheck-inferior-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny-server")
-;; ;;(setq boogie-friends-profile-analyzer-executable "PATH-TO-Z3-AXIOM-PROFILER") ;; Optional
-
-
-;; For package multiple-cursors ===============================================
-(require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
-;; I don't know what this is ==================================================
-(require 'seq)
-
-
-;; ============================================================================
-
 ;; Change silly defaults for Home and End keys on Mac
 (global-set-key [home] 'move-beginning-of-line)
 (global-set-key [end] 'move-end-of-line)
@@ -368,6 +300,50 @@
 
 ;; Use ripgrep.
 (require 'grep) ;; seems necessary for grep-apply-setting to exist during initialization (?)
+
+;; HTML entities (key bindings chosen to match MacOS defaults) ================
+
+(defun insert-ldquo () (interactive) (insert "“"))
+(define-key global-map "\M-[" 'insert-ldquo)
+
+(defun insert-rdquo () (interactive) (insert "”"))
+(define-key global-map "\M-{" 'insert-rdquo)
+
+(defun markdown-mode-keymap-smackdown ()
+  (local-unset-key "\M-}")
+  (local-unset-key "\M-{"))
+(add-hook 'markdown-mode-hook 'markdown-mode-keymap-smackdown)
+
+(defun insert-lsquo () (interactive) (insert "‘"))
+(define-key global-map "\M-]" 'insert-lsquo)
+
+(defun insert-rsquo () (interactive) (insert "’"))
+(define-key global-map "\M-}" 'insert-rsquo)
+
+(defun insert-mdash () (interactive) (insert "—"))
+(define-key global-map "\M-_" 'insert-mdash)
+
+
+;; For package magit ==========================================================
+(global-set-key (kbd "C-x g") 'magit-status)
+
+
+;; ;; For package boogie-friends =================================================
+;; (add-to-list 'load-path "~/repos/boogie-friends/emacs/")
+;; (require 'boogie-friends)
+;; (setq flycheck-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny")
+;; ;;(setq flycheck-boogie-executable "PATH-TO-BOOGIE")  ;; can't figure out
+;; (setq flycheck-z3-smt2-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/z3/bin/z3")
+;; (setq flycheck-inferior-dafny-executable "/Users/jorendorff/play/dafny/dafny-3.0.0pre1-prebuilt/dafny-server")
+;; ;;(setq boogie-friends-profile-analyzer-executable "PATH-TO-Z3-AXIOM-PROFILER") ;; Optional
+
+
+;; For package multiple-cursors ===============================================
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 
 ;; Custom.
