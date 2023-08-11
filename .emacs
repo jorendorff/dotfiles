@@ -376,6 +376,7 @@
  '(lean-memory-limit 4096)
  '(lean-rootdir "~/.elan")
  '(magit-list-refs-sortby '("-creatordate"))
+ '(make-backup-files nil)
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
