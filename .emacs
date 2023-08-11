@@ -326,7 +326,7 @@
  ;; If there is more than one, they won't work right.
  '(c-comment-prefix-regexp "#\\|//+>?\\|\\**")
  '(create-lockfiles nil)
- '(fill-column 79)
+ '(fill-column 99)
  '(flycheck-checker-error-threshold 2000)
  '(global-company-mode nil)
  '(grep-find-command '("rg -n -H --no-heading -e '' " . 27))
