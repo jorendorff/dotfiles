@@ -60,10 +60,6 @@
 
 (add-to-list 'load-path "~/src/boogie-friends/emacs/")
 
-
-;; Disable ns-popup-font-panel on Mac
-(global-unset-key (kbd "s-t"))
-
 ;; Enable company globally for all modes
 ;;(global-company-mode)
 ;;
@@ -102,15 +98,6 @@
     result))
 (defalias 'plist-to-alist 'gcr/plist-to-alist)
 
-;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
-(global-set-key [mouse-6] (function (lambda () (interactive) nil)))
-(global-set-key [mouse-7] (function (lambda () (interactive) nil)))
-
-;; Don't vanish and lose keyboard focus when I type Ctrl-Z, the standard key
-;; for undo on Linux and Windows.
-(define-key global-map [(control ?z)] nil)
-(define-key ctl-x-map [(control ?z)] nil)
-
 (require 'page-ext)
 
 (add-hook 'dafny-mode-hook #'(lambda ()
@@ -128,6 +115,24 @@
 (add-to-list 'auto-mode-alist '("\\.md" . markdown-mode))
 
 
+;; Turning stuff off that has no business existing ============================
+
+;; Don't vanish and lose keyboard focus when I type Ctrl-Z, the standard key
+;; for undo on Linux and Windows.
+(define-key global-map [(control ?z)] nil)
+(define-key ctl-x-map [(control ?z)] nil)
+
+;; Disable ns-popup-font-panel on Mac
+(global-unset-key (kbd "s-t"))
+
+;; No nasty tool-bar! good grief
+(tool-bar-mode 0)
+
+;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
+(global-set-key [mouse-6] (function (lambda () (interactive) nil)))
+(global-set-key [mouse-7] (function (lambda () (interactive) nil)))
+
+
 ;; My custom tweaks ===========================================================
 
 ;; Show column numbers in mode line.
@@ -136,8 +141,9 @@
 ;; When cursor is on a bracket, highlight the matching bracket.
 (show-paren-mode t)
 
-;; No nasty tool-bar! good grief
-(tool-bar-mode 0)
+;; Emoji on Mac 🚀🍩💖
+(when (member "Apple Color Emoji" (font-family-list))
+  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 
 ;; Save before grepping, thanks to Jim Blandy.
 (defadvice grep (before save-before-grepping)
