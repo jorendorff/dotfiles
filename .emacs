@@ -237,6 +237,11 @@
 (global-set-key [home] 'move-beginning-of-line)
 (global-set-key [end] 'move-end-of-line)
 
+;; Things to do only when running in GUI mode:
+(when (not (null (window-system)))
+  (server-start)
+  (setq confirm-kill-emacs 'yes-or-no-p))
+
 
 ;; Mac-like key bindings ======================================================
 
@@ -278,38 +283,6 @@
 (global-set-key (kbd "C-<iso-lefttab>") 'previous-buffer)  ;; linux :-|
 (global-set-key (kbd "C-S-<tab>") 'previous-buffer)  ;; mac :-\
 
-;; Special stuff to avoid when running in a terminal
-(when (not (null (window-system)))
-  (server-start)
-  (setq confirm-kill-emacs 'yes-or-no-p))
-
-
-;; Neat functions I will never use again ======================================
-
-(defun jorendorff-lean-arrange-windows ()
-  "Arrange windows for lean-mode."
-  (interactive)
-  (lean-ensure-info-buffer lean-show-goal-buffer-name)
-  (lean-ensure-info-buffer lean-next-error-buffer-name)
-  (delete-other-windows)
-  (split-window-right)
-  (other-window 1)
-  (switch-to-buffer lean-show-goal-buffer-name)
-  (split-window-below)
-  (other-window 1)
-  (switch-to-buffer lean-next-error-buffer-name)
-  (other-window 1))
-
-(defun grep-for-symbol-at-point ()
-  "Do a grep for the symbol currently under the cursor"
-  (interactive)
-  (let* ((cur-word (thing-at-point 'symbol))
-         (cmd (concat "grep -rnH " cur-word " .")))
-    (grep-apply-setting 'grep-command cmd)
-    (grep cmd)))
-
-;; Use ripgrep.
-(require 'grep) ;; seems necessary for grep-apply-setting to exist during initialization (?)
 
 ;; HTML entities (key bindings chosen to match MacOS defaults) ================
 
