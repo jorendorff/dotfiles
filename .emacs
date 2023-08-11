@@ -17,6 +17,7 @@
 (use-package flycheck)
 (use-package magit)
 (use-package multiple-cursors)
+(use-package yasnippet)
 
 (use-package haskell-mode)
 (use-package lua-mode)
@@ -24,9 +25,22 @@
 (use-package protobuf-mode)
 (use-package terraform-mode)
 (use-package yaml-mode)
+(use-package wgsl-mode)
+(use-package boogie-friends)
 
 (use-package lean-mode)
 (use-package company-lean)
+
+;; I don't know what this is, but it looks so terrifyingly important I will never delete it.
+(use-package xref
+  :pin gnu)
+
+(use-package eldoc
+  :pin gnu
+  :bind ("s-d" . #'eldoc)
+  :custom
+  (eldoc-echo-area-prefer-doc-buffer t)
+  (eldoc-echo-area-use-multiline-p nil))
 
 (use-package xah-math-input
   :bind (:map xah-math-input-keymap
@@ -237,7 +251,6 @@
   (interactive "r")
   (indent-rigidly start end -4))
 (global-set-key [?\C-<] 'dedent-rigidly-4)
-
 
 (defun jimb-diff-mode-hook ()
   (define-key diff-mode-map "\M-q" nil))
