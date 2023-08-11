@@ -146,6 +146,16 @@
 (define-key global-map (kbd "C-x w") 'work-log)
 
 
+;; Custom hack for pasting bits of GitHub UI text into my work journal.
+(defun jorendorff--insert-for-yank (orig-insert-for-yank string)
+  (apply orig-insert-for-yank
+   (if (and (string= (buffer-file-name) "/Users/jorendorff/misc/work-log.md")
+            (string-match "^ \\(.*?\\)\\.? \\(#[0-9]+\\) $" string))
+       (replace-match "\"\\1\", \\2" t nil string)
+     string)
+   nil))
+
+(advice-add 'insert-for-yank :around #'jorendorff--insert-for-yank)
 
 
 (defun gcr/plist-to-alist (ls)
