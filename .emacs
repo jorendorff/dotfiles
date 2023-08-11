@@ -143,11 +143,7 @@
 (define-key global-map (kbd "C-x w") 'work-log)
 
 
-;;(visit-tags-table "~/work/gecko/TAGS")
 
-;; (require 'etags-select)
-;; (global-set-key "\M-?" 'etags-select-find-tag-at-point)
-;; (global-set-key "\M-." 'etags-select-find-tag)
 
 (defun gcr/plist-to-alist (ls)
   "Convert a plist to an alist. Primarily for old color-theme themes."
