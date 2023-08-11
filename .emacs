@@ -52,6 +52,14 @@
   (define-key xah-math-input-keymap (kbd "S-SPC") nil)
   (global-xah-math-input-mode))
 
+(use-package rg
+  :init
+  (rg-define-search jorendorff-rg-literal-in-project
+    :format literal
+    :files current
+    :flags ("--sort" "path")
+    :dir project)
+  :bind ("M-g r" . #'jorendorff-rg-literal-in-project))
 
 (use-package lsp-mode
   :ensure
@@ -208,7 +216,7 @@
 ;; Cycle through grep hits with C-`.
 (global-set-key [?\C-`] 'next-error)
 (global-set-key [?\C-~] 'previous-error)
-(global-set-key "\M-gr" 'grep-find)
+
 (global-set-key "\M-q"  'fill-paragraph)
 
 ;; C-< and C->
