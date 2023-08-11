@@ -8,6 +8,9 @@
                          ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
+(eval-when-compile
+  (require 'use-package))
+
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)  ;; auto-install packages, YOLO
 
