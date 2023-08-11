@@ -8,4 +8,4 @@
 #
 # I don't know why setting PS1 here has no effect.  See `.zshrc`.
 
-
+export PATH="$HOME/.elan/bin:$PATH"
