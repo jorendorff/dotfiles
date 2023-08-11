@@ -396,7 +396,7 @@
      (buffer-file-coding-system . utf-8-unix)
      (insert-tabs-mode)))
  '(sentence-end-double-space nil)
- '(vc-handled-backends nil))
+ '(vc-handled-backends '(Git)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
