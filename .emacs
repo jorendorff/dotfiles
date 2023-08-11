@@ -12,7 +12,6 @@
 (setq use-package-always-ensure t)  ;; auto-install packages, YOLO
 
 (use-package flycheck)
-(use-package eglot)
 (use-package magit)
 (use-package multiple-cursors)
 
@@ -53,8 +52,61 @@
   (define-key xah-math-input-keymap (kbd "S-SPC") nil)
   (global-xah-math-input-mode))
 
-(use-package rust-mode)
 
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :hook rust-mode
+  :custom
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all nil)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints nil)
+  ; waaay too obstructive
+  ;:config
+  ;(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  )
+
+'(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil))
+
+(use-package rust-mode
+  :mode "\\.rs\\'"
+  :bind (:map rust-mode-map
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c s" . lsp-rust-analyzer-status)
+              ("C-c C-c t" . lsp-find-type-definition)))
+
+;; Failed attempt to use eglot and rustic =====================================
+;;
+;; (use-package eglot
+;;   :hook ((rustic-mode) . eglot-ensure))
+;;
+;; (use-package rust-mode
+;;   :hook (rust-mode . flycheck-mode))
+;;
+;; (use-package rustic
+;;   :init
+;;   (setq rustic-lsp-client 'eglot)
+;;   ;; Turn off flymake.
+;;   (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
+;;   ;; eglot-format on save.
+;;   (add-hook 'rustic-mode-hook
+;;             (lambda () (add-hook 'before-save-hook
+;;                                  (lambda () (when (eq major-mode 'rustic-mode)
+;;                                               (eglot-format-buffer)))
+;;                                  nil
+;;                                  'local))))
 
 ;; Other junk =================================================================
 
@@ -342,7 +394,7 @@
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   '(magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
+   '(wgsl-mode rg rustic magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(pop-up-windows nil)
