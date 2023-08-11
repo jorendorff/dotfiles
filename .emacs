@@ -234,14 +234,17 @@
 (global-set-key [home] 'move-beginning-of-line)
 (global-set-key [end] 'move-end-of-line)
 
-;; Mac-like key bindings: Cmd+A to select all
+
+;; Mac-like key bindings ======================================================
+
+;; Cmd+A to select all
 (defun select-all ()
   (interactive "")
   (set-mark (point-min))
   (goto-char (point-max)))
 (global-set-key [(super ?a)] 'select-all)
 
-;; Mac-like key-bindings: Cmd+G to find again.
+;; Cmd+G to find again.
 ;; Bind s-g and s-G to "search again", like C-s C-s and C-r C-r.
 (defun jorendorff-isearch-again-forward ()
   "Do the equivalent of C-s C-s."
@@ -260,7 +263,7 @@
 (global-set-key (kbd "s-G") 'jorendorff-isearch-again-backward)
 (define-key isearch-mode-map [(super ?G)] 'isearch-repeat-backward)
 
-;; Mac-like key-bindings: Cmd+W to close a buffer.
+;; Cmd+W to close a buffer.
 (defun kill-current-buffer ()
   "Kill the current buffer without prompting which buffer to kill."
   (interactive)
