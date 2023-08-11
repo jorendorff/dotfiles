@@ -372,6 +372,7 @@
  '(lean-memory-limit 4096)
  '(lean-rootdir "~/.elan")
  '(magit-list-refs-sortby '("-creatordate"))
+ '(magit-repository-directories '(("/Users/jorendorff/src/blackbird" . 0)))
  '(make-backup-files nil)
  '(menu-bar-mode nil)
  '(mouse-wheel-progressive-speed nil)
