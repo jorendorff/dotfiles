@@ -381,7 +381,6 @@
    '(wgsl-mode rg rustic magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
- '(pop-up-windows nil)
  '(ring-bell-function 'ignore)
  '(safe-local-variable-values
    '((eval c-set-offset 'arglist-cont-nonempty
