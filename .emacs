@@ -31,6 +31,11 @@
 (use-package lean-mode)
 (use-package company-lean)
 
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 ;; I don't know what this is, but it looks so terrifyingly important I will never delete it.
 (use-package xref
   :pin gnu)
@@ -92,6 +97,11 @@
   ;:config
   ;(add-hook 'lsp-mode-hook 'lsp-ui-mode)
   )
+
+(use-package company
+  :ensure
+  ;; hope against hope to disable company forever everywhere
+  :custom (company-idle-delay nil))
 
 '(use-package lsp-ui
   :ensure
@@ -378,7 +388,7 @@
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   '(wgsl-mode rg rustic magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
+   '(exec-path-from-shell wgsl-mode rg rustic magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(ring-bell-function 'ignore)
