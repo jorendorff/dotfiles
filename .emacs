@@ -126,7 +126,10 @@
               ("C-c C-c Q" . lsp-workspace-shutdown)
               ("C-c C-c r" . lsp-rename)
               ("C-c C-c s" . lsp-rust-analyzer-status)
-              ("C-c C-c t" . lsp-find-type-definition)))
+              ("C-c C-c t" . lsp-find-type-definition))
+  :config
+  (add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
+                                           (lsp-format-buffer)))))
 
 ;; Failed attempt to use eglot and rustic =====================================
 ;;
