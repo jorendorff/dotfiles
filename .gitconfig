@@ -23,8 +23,22 @@
 [advice]
 	detachedHead = false
 
-[core]
-        excludesFile = ~/.gitignore
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	branch = main
+	defaultBranch = main
 
-[credential]
-	helper = osxkeychain
+# Rewrite all HTTPS repo URLs to use SSH instead. But see the exceptions below.
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+# The extra rules below are exceptions to the above rule for tools that can't handle it.
+# Carveout for `cargo edit`
+[url "https://github.com/rust-lang/crates.io-index"]
+  insteadOf = https://github.com/rust-lang/crates.io-index
+# Carveout for `cargo audit`
+[url "https://github.com/RustSec/advisory-db"]
+  insteadOf = https://github.com/RustSec/advisory-db
