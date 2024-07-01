@@ -53,6 +53,8 @@ alias ok='(exit $?)'
 fpath+=~/.zfunc
 autoload -U compinit; compinit -C
 
+export RUST_BACKTRACE=1
+
 # (GitHub work) Use goproxy.
 export GOPROXY=https://goproxy.githubapp.com/mod,https://proxy.golang.org/,direct
 export GOPRIVATE=
