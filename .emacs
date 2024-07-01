@@ -390,6 +390,8 @@
  '(js-indent-level 2)
  '(lean-memory-limit 4096)
  '(lean-rootdir "~/.elan")
+ '(lsp-enable-file-watchers nil)
+ '(lsp-enable-on-type-formatting nil)
  '(magit-list-refs-sortby '("-creatordate"))
  '(magit-repository-directories '(("/Users/jorendorff/src/blackbird" . 0)))
  '(make-backup-files nil)
@@ -401,6 +403,7 @@
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(ring-bell-function 'ignore)
+ '(rust-format-on-save t)
  '(safe-local-variable-values
    '((eval c-set-offset 'arglist-cont-nonempty
            '(c-lineup-gcc-asm-reg c-lineup-arglist))
