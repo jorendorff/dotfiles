@@ -399,7 +399,7 @@
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   '(exec-path-from-shell wgsl-mode rg rustic magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
+   '(elixir-mode exec-path-from-shell wgsl-mode rg magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(ring-bell-function 'ignore)
