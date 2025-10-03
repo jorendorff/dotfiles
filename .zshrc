@@ -67,3 +67,5 @@ export NVM_DIR="$HOME/.nvm"
 if which github-copilot-cli >/dev/null; then
   eval "$(github-copilot-cli alias -- "$0")" # Add ?? and git? to the PATH
 fi
+
+eval "$(direnv hook zsh)"

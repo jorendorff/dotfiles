@@ -13,7 +13,8 @@ export PATH=$(echo $PATH | sed 's/\(^\|:\)[^:]*\/.rvm\/[^:]*$//g')
 # Remove them first so PATH doesn't get longer and longer as we nest interactive shells.
 PATH=$(echo $PATH|sed 's/\(^\|:\)usr\/local\/bin:/\1/g')
 export PATH=/usr/local/bin:${PATH}
-for p in "${HOME}/prefix/bin" \
+for p in "/opt/homebrew/bin" \
+             "${HOME}/prefix/bin" \
              "${HOME}/bin" \
              "${HOME}/src/dotfiles/myscripts" \
              "/usr/local/sbin" \
