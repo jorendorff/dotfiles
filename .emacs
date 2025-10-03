@@ -17,9 +17,9 @@
 (use-package flycheck)
 (use-package magit)
 (use-package multiple-cursors)
-(use-package yasnippet)
+(use-package yasnippet
+  :hook (rust-mode . yas-minor-mode-on))
 
-(use-package haskell-mode)
 (use-package lua-mode)
 (use-package markdown-mode)
 (use-package protobuf-mode
@@ -32,6 +32,7 @@
 (use-package terraform-mode)
 (use-package yaml-mode)
 (use-package wgsl-mode)
+(use-package go-mode)
 (use-package boogie-friends)
 
 (use-package lean-mode)
@@ -52,33 +53,6 @@
   :custom
   (eldoc-echo-area-prefer-doc-buffer t)
   (eldoc-echo-area-use-multiline-p nil))
-
-(use-package xah-math-input
-  :bind (:map xah-math-input-keymap
-              ("C-x C-SPC" . xah-math-input-change-to-symbol)
-              ("M-S-SPC" . xah-math-input-change-to-symbol))
-
-  :config
-  (puthash "<" "⟨" xah-math-input-abrvs)
-  (puthash ">" "⟩" xah-math-input-abrvs)
-  (puthash "ring" "∘" xah-math-input-abrvs)
-  (puthash "compose" "∘" xah-math-input-abrvs)
-  (puthash "check" "✓" xah-math-input-abrvs)
-  (puthash "<|" "⊲" xah-math-input-abrvs)
-  (puthash "|>" "⊳" xah-math-input-abrvs)
-  (puthash "_|_" "⊥" xah-math-input-abrvs)
-  (puthash "<>" "◇" xah-math-input-abrvs)
-  (puthash "[]" "◻" xah-math-input-abrvs)
-  (puthash "~" "¬" xah-math-input-abrvs)
-  (puthash "|=" "⊨" xah-math-input-abrvs)
-
-  ;; pedantically insist on U+22C5 DOT OPERATOR rather than U+2022 BULLET
-  ;; or, like, U+2219 BULLET OPERATOR, etc. ad nauseam.
-  (xah-math-input--add-cycle ["*" "⋅" "•" "×"]) ; multiply, times
-
-  ;; I don't like the default key-binding.
-  (define-key xah-math-input-keymap (kbd "S-SPC") nil)
-  (global-xah-math-input-mode))
 
 (use-package rg
   :init
@@ -126,10 +100,7 @@
               ("C-c C-c Q" . lsp-workspace-shutdown)
               ("C-c C-c r" . lsp-rename)
               ("C-c C-c s" . lsp-rust-analyzer-status)
-              ("C-c C-c t" . lsp-find-type-definition))
-  :config
-  (add-hook 'before-save-hook (lambda () (when (eq 'rust-mode major-mode)
-                                           (lsp-format-buffer)))))
+              ("C-c C-c t" . lsp-find-type-definition)))
 
 ;; Failed attempt to use eglot and rustic =====================================
 ;;
@@ -406,7 +377,6 @@ Returns a cons cell (number . title)."
  '(global-company-mode nil)
  '(grep-find-command '("rg -n -H --no-heading -e '' " . 27))
  '(grep-use-null-device nil)
- '(haskell-mode-hook '(turn-on-haskell-indentation))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
@@ -414,6 +384,7 @@ Returns a cons cell (number . title)."
  '(lean-rootdir "~/.elan")
  '(lsp-enable-file-watchers nil)
  '(lsp-enable-on-type-formatting nil)
+ '(lsp-rust-all-features t)
  '(magit-list-refs-sortby '("-creatordate"))
  '(magit-repository-directories '(("/Users/jorendorff/src/blackbird" . 0)))
  '(make-backup-files nil)
@@ -421,20 +392,18 @@ Returns a cons cell (number . title)."
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   '(elixir-mode exec-path-from-shell wgsl-mode rg magit git-commit magit-section transient with-editor lua-mode terraform-mode use-package play-rust yasnippet lsp-treemacs protobuf-mode company lsp-ui flycheck lsp-mode yaml-mode nix-mode magithub markup-faces adoc-mode deft flymake-go go-mode proof-general company-lean helm-lean lean-mode xah-math-input boogie-friends idris-mode clojure-mode markdown-mode zoom-frm haskell-mode cl-lib))
+   '(boogie-friends company-lean exec-path-from-shell git-commit go-mode lsp-mode
+                    lua-mode magit multiple-cursors protobuf-mode rg rust-mode terraform-mode
+                    wgsl-mode yaml-mode))
  '(paren-match-face 'paren-face-match-light)
  '(paren-sexp-mode t)
  '(ring-bell-function 'ignore)
  '(rust-format-on-save t)
  '(safe-local-variable-values
-   '((eval c-set-offset 'arglist-cont-nonempty
-           '(c-lineup-gcc-asm-reg c-lineup-arglist))
-     (eval c-set-offset 'arglist-close 0)
-     (eval c-set-offset 'arglist-intro '++)
-     (eval c-set-offset 'case-label 0)
-     (eval c-set-offset 'statement-case-open 0)
-     (eval c-set-offset 'substatement-open 0)
-     (buffer-file-coding-system . utf-8-unix)
+   '((eval c-set-offset 'arglist-cont-nonempty '(c-lineup-gcc-asm-reg c-lineup-arglist))
+     (eval c-set-offset 'arglist-close 0) (eval c-set-offset 'arglist-intro '++)
+     (eval c-set-offset 'case-label 0) (eval c-set-offset 'statement-case-open 0)
+     (eval c-set-offset 'substatement-open 0) (buffer-file-coding-system . utf-8-unix)
      (insert-tabs-mode)))
  '(sentence-end-double-space nil)
  '(vc-handled-backends '(Git)))
