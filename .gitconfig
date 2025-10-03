@@ -10,6 +10,9 @@
 [pull]
 	ff = only
 
+[checkout]
+	defaultRemote = origin
+
 [diff]
         algorithm = patience
         submodule = log
