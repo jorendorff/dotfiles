@@ -179,13 +179,35 @@
 (define-key global-map (kbd "C-x w") 'work-log)
 
 
+(defun gh-pr-info (url)
+  "Get PR number and title from URL using gh CLI.
+Returns a cons cell (number . title)."
+  (let* ((command (format "gh pr view %s --json 'number,title'"
+                         (shell-quote-argument url)))
+         (output (shell-command-to-string command))
+         (json-data (json-read-from-string output))
+         (number (cdr (assoc 'number json-data)))
+         (title (cdr (assoc 'title json-data))))
+    (cons number title)))
+
 ;; Custom hack for pasting bits of GitHub UI text into my work journal.
+;; If this stops working, check if your token is expired and if SSO is authorized. :-\
 (defun jorendorff--insert-for-yank (orig-insert-for-yank string)
   (apply orig-insert-for-yank
-   (if (and (string= (buffer-file-name) "/Users/jorendorff/misc/work-log.md")
-            (string-match "^ \\(.*?\\)\\.? \\(#[0-9]+\\) $" string))
-       (replace-match "\"\\1\", \\2" t nil string)
-     string)
+         (if (string= (buffer-file-name) "/Users/jorendorff/misc/work-log.md")
+             (cond
+              ((string-match "^ ?\\(.*?\\)\\.? #\\([0-9]+\\) ?$" string)
+               (replace-match "\"\\1\", [#\\2](https://github.com/github/blackbird/pull/\\2)" t nil string))
+              ((string-match "^https://github.com/\\([^/]+/[^/]+\\)/pull/[0-9]+/?" string)
+               (pcase-let* ((nwo (match-string 1 string))
+                            (tag (cond
+                                  ((string= nwo "github/blackbird") "")
+                                  ((string= nwo "github/blackbird-mw") "mw")
+                                  (t nwo)))
+                            (`(,number . ,title) (gh-pr-info string)))
+                 (format "\"%s\", [%s#%s](%s)" title tag number string)))
+              (t string))
+           string)
    nil))
 
 (advice-add 'insert-for-yank :around #'jorendorff--insert-for-yank)
