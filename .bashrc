@@ -13,8 +13,7 @@ export PATH=$(echo $PATH | sed 's/\(^\|:\)[^:]*\/.rvm\/[^:]*$//g')
 # Remove them first so PATH doesn't get longer and longer as we nest interactive shells.
 PATH=$(echo $PATH|sed 's/\(^\|:\)usr\/local\/bin:/\1/g')
 export PATH=/usr/local/bin:${PATH}
-for p in "/opt/homebrew/bin" \
-             "${HOME}/prefix/bin" \
+for p in "${HOME}/prefix/bin" \
              "${HOME}/bin" \
              "${HOME}/src/dotfiles/myscripts" \
              "/usr/local/sbin" \
@@ -25,6 +24,10 @@ for p in "/opt/homebrew/bin" \
     PATH=$(echo "$PATH" | sed 's/\(^\|:\)'"$pr"':/\1/g')
     export PATH="${PATH}:${p}"
 done
+
+if [[ -d /opt/homebrew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 if [[ "$TERM" == dumb ]]; then
     export PS1='\w\$ '

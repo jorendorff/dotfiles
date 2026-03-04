@@ -68,4 +68,8 @@ if which github-copilot-cli >/dev/null; then
   eval "$(github-copilot-cli alias -- "$0")" # Add ?? and git? to the PATH
 fi
 
+# Add things to the path. This runs after /etc/zprofile, which adds system things, in order to override them.
 eval "$(direnv hook zsh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+. "$HOME/.cargo/env"
+export PATH="$PATH:$HOME/go/bin"
