@@ -363,8 +363,22 @@ Returns a cons cell (number . title)."
 (define-key global-map "\M-_" 'insert-mdash)
 
 
-;; For package magit ==========================================================
-(global-set-key (kbd "C-x g") 'magit-status)
+;; For package magit / majjik ==================================================
+
+;; majjik-mode: jujutsu (jj) interface, like magit but for jj
+(add-to-list 'load-path "~/src/majjik-mode")
+(autoload 'majjik-status "majjik" "Show the status of the current jj repository." t)
+
+(defun jorendorff-vcs-status ()
+  "Open magit-status for git repos, majjik-status for jj repos."
+  (interactive)
+  (cond
+   ((locate-dominating-file default-directory ".jj")
+    (majjik-status))
+   (t
+    (magit-status))))
+
+(global-set-key (kbd "C-x g") 'jorendorff-vcs-status)
 
 
 ;; ;; For package boogie-friends =================================================
