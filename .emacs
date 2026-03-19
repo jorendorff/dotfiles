@@ -234,7 +234,7 @@ Returns a cons cell (number . title)."
 (global-unset-key (kbd "s-t"))
 
 ;; No nasty tool-bar! good grief
-(tool-bar-mode 0)
+(tool-bar-mode -1)
 
 ;; mouse-6 is triggered by two-finger-scrolling to the right; mouse-7 to the left
 (global-set-key [mouse-6] (function (lambda () (interactive) nil)))
