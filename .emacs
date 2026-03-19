@@ -32,7 +32,11 @@
 (use-package terraform-mode)
 (use-package yaml-mode)
 (use-package wgsl-mode)
-(use-package go-mode)
+(use-package go-mode
+  :config
+  (add-hook 'go-mode-hook #'lsp-deferred)
+  )
+(use-package typescript-ts-mode)
 (use-package boogie-friends)
 
 (use-package lean-mode)
@@ -65,17 +69,26 @@
 
 (use-package lsp-mode
   :ensure
-  :commands lsp
-  :hook rust-mode
+  :commands (lsp lsp-deferred lsp-format-buffer lsp-organize-imports)
+  :hook ((rust-mode . lsp-deferred)
+         (go-mode . lsp-deferred))
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all nil)
   (lsp-idle-delay 0.6)
   (lsp-rust-analyzer-server-display-inlay-hints nil)
-  ; waaay too obstructive
-  ;:config
-  ;(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  ;; waaay too obstructive
+  ;; :config
+  ;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+  :config
+  ;; Set up before-save hooks to format buffer and add/delete imports.
+  ;; Make sure you don't have other gofmt/goimports hooks enabled.
+  (defun lsp-go-install-save-hooks ()
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
   )
 
 (use-package company
