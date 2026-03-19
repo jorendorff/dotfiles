@@ -277,6 +277,16 @@ Returns a cons cell (number . title)."
   (indent-rigidly start end -4))
 (global-set-key [?\C-<] 'dedent-rigidly-4)
 
+;; Prompt before exiting emacs. The reason I'm doing this instead of setting `confirm-kill-emacs`
+;; is a vague suspicion that that also blocks macOS from closing Emacs to install updates.
+(defun jorendorff-kill-emacs ()
+  (interactive "")
+  (and (yes-or-no-p "Exit emacs?")
+       (save-buffers-kill-emacs)))
+(when (not (null (window-system)))
+  (global-set-key [?\s-q] 'jorendorff-kill-emacs)
+  (global-set-key [?\C-x ?\C-c] 'jorendorff-kill-emacs))
+
 (defun jimb-diff-mode-hook ()
   (define-key diff-mode-map "\M-q" nil))
 (add-hook 'diff-mode-hook 'jimb-diff-mode-hook)
@@ -287,9 +297,7 @@ Returns a cons cell (number . title)."
 
 ;; Things to do only when running in GUI mode:
 (when (not (null (window-system)))
-  (server-start)
-  (setq confirm-kill-emacs 'yes-or-no-p))
-
+  (server-start))
 
 ;; Mac-like key bindings ======================================================
 
