@@ -16,28 +16,21 @@ zstyle ':vcs_info:*' enable git
 # blue and in bold; incorporate "$vcs_info_msg_0_" from the above code.
 export PS1='%0(?.%F{green}.%F{red}[error:%?] )%D{%F %T}%f %F{blue}%B%~ $vcs_info_msg_0_❯%b%f '
 
-# Add ruby stuff to the PATH.
-eval "$(rbenv init -)"
 
 
 # Aliases
 
-function blackbirdctl() {
-    (cd "$HOME/src/blackbird" &&
-         cargo run -p blackbirdctl --release -- "$@")
+function emacs() {
+    nohup /Applications/Emacs.app/Contents/MacOS/emacs &! > /dev/null
 }
 
-function blackbird-server() {
-    (cd "$HOME/src/blackbird" &&
-         cargo run -p blackbird-server --release -- "$@")
+function blackbirdctl() {
+    cargo run --manifest-path ~/src/blackbird -p blackbirdctl --release -- "$@"
 }
 
 function linux() {
     docker run --name ubuntu-bash --rm -i -t ubuntu bash
 }
-
-alias bbctl=blackbirdctl
-alias bb=blackbird-client
 
 function ggu() {
     git grep -ho -P "$@" | sort | uniq -c
@@ -61,15 +54,16 @@ export GOPRIVATE=
 export GONOPROXY=
 export GONOSUMDB='github.com/github/*'
 
+# === PATH setup
+# This runs after /etc/zprofile, which adds system things, in order to override them.
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-if which github-copilot-cli >/dev/null; then
-  eval "$(github-copilot-cli alias -- "$0")" # Add ?? and git? to the PATH
-fi
 
-# Add things to the path. This runs after /etc/zprofile, which adds system things, in order to override them.
+eval "$(/opt/homebrew/bin/brew shellenv)"  # required for rbenv and direnv
+eval "$(rbenv init -)"
 eval "$(direnv hook zsh)"
-eval "$(/opt/homebrew/bin/brew shellenv)"
 . "$HOME/.cargo/env"
 export PATH="$PATH:$HOME/go/bin"
+export PATH="$HOME/.elan/bin:$PATH"
