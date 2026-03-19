@@ -249,6 +249,9 @@ Returns a cons cell (number . title)."
 ;; When cursor is on a bracket, highlight the matching bracket.
 (show-paren-mode t)
 
+;; Default font
+(set-face-attribute 'default nil :family "Fira Mono" :height 120)
+
 ;; Emoji on Mac 🚀🍩💖
 (when (member "Apple Color Emoji" (font-family-list))
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
