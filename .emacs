@@ -136,6 +136,17 @@
 ;;                                  nil
 ;;                                  'local))))
 
+;; Pick a fun font for programming
+;; Note: This requires Fira Code and "Fira Code Symbols" fonts
+;; <https://github.com/tonsky/FiraCode/issues/211#issuecomment-239058632> to be installed.
+(use-package fira-code-mode
+  :hook prog-mode
+  :custom
+  (fira-code-mode-disabled-ligatures '("[]" "x") "disable bad ligatures")
+  :config
+  (fira-code-mode-set-font))
+
+
 ;; Other junk =================================================================
 
 (add-to-list 'load-path "~/src/boogie-friends/emacs/")
@@ -248,9 +259,6 @@ Returns a cons cell (number . title)."
 
 ;; When cursor is on a bracket, highlight the matching bracket.
 (show-paren-mode t)
-
-;; Default font
-(set-face-attribute 'default nil :family "Fira Mono" :height 120)
 
 ;; Emoji on Mac 🚀🍩💖
 (when (member "Apple Color Emoji" (font-family-list))
@@ -430,7 +438,7 @@ Returns a cons cell (number . title)."
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
  '(package-selected-packages
-   '(boogie-friends company-lean exec-path-from-shell git-commit go-mode lsp-mode
+   '(boogie-friends company-lean exec-path-from-shell fira-code-mode git-commit go-mode lsp-mode
                     lua-mode magit multiple-cursors protobuf-mode rg rust-mode terraform-mode
                     wgsl-mode yaml-mode))
  '(paren-match-face 'paren-face-match-light)
